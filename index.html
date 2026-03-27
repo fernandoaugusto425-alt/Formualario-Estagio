@@ -12,9 +12,10 @@
   
   <style>
     .glass-effect {
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(12px);
     }
+    /* Gradiente da escola: Azul para Laranja */
     .school-bg {
       background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #f97316 100%);
     }
@@ -60,11 +61,6 @@
         { id: 'social', label: 'Social' }
       ];
 
-      const areasTrelo = [
-        { id: 'marketing', label: 'Marketing' }, { id: 'v_merch', label: 'Visual Merch.' },
-        { id: 'adm', label: 'Administrativo' }, { id: 'logistica', label: 'Logística' }
-      ];
-
       const handleRanking = (listName, id, max) => {
         let current = [...formData[listName]];
         if (current.includes(id)) {
@@ -76,7 +72,7 @@
       };
 
       const handleImageError = (e, fallbackText) => {
-        e.target.src = `https://via.placeholder.com/200?text=${fallbackText}`;
+        e.target.src = `https://via.placeholder.com/300?text=${fallbackText}`;
       };
 
       if (isSubmitted) {
@@ -87,7 +83,7 @@
                 <IconCheck />
               </div>
               <h2 className="text-3xl font-black text-slate-800 mb-2 uppercase">Enviado!</h2>
-              <p className="text-slate-600 mb-8 text-lg">Obrigado, {formData.nome.split(' ')[0]}! O teu questionário foi registado.</p>
+              <p className="text-slate-700 mb-8 text-lg font-bold">Obrigado, {formData.nome.split(' ')[0]}! O teu questionário foi registado.</p>
               <button onClick={() => window.location.reload()} className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest">Voltar</button>
             </div>
           </div>
@@ -98,52 +94,52 @@
         <div className="py-12 px-4">
           <div className="max-w-3xl mx-auto">
             
-            {/* CABEÇALHO - LOGO ESCOLA */}
+            {/* CABEÇALHO - LOGO EXTRA GRANDE */}
             <div className="text-center mb-10">
-              <div className="inline-block p-4 bg-white rounded-full shadow-2xl mb-6 border-4 border-white/30 overflow-hidden">
+              <div className="inline-block p-6 bg-white rounded-full shadow-2xl mb-8 border-8 border-white/40 overflow-hidden">
                 <img 
                   src="./logo.png" 
                   alt="Logo Escola" 
-                  className="w-48 h-48 sm:w-56 sm:h-56 object-contain rounded-full transition-transform hover:scale-105 duration-300"
+                  className="w-56 h-56 sm:w-72 sm:h-72 object-contain rounded-full transition-transform hover:scale-105 duration-300"
                   onError={(e) => handleImageError(e, 'ESCOLA')}
                 />
               </div>
-              <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-2xl mb-2">Questionário Alunos Técnico</h1>
-              <p className="text-blue-50 font-bold opacity-90 mt-2 tracking-wide italic text-lg sm:text-xl">Coronel Castanho de Almeida • 2026</p>
+              <h1 className="text-4xl sm:text-6xl font-black text-white uppercase tracking-tighter drop-shadow-2xl mb-2">Questionário Alunos Técnico</h1>
+              <p className="text-blue-50 font-black opacity-100 mt-2 tracking-wide italic text-xl sm:text-2xl drop-shadow-md">Coronel Castanho de Almeida • 2026</p>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); setIsSubmitted(true); }} className="glass-effect space-y-12 rounded-[3rem] p-6 sm:p-14 shadow-2xl border border-white/20">
+            <form onSubmit={(e) => { e.preventDefault(); setIsSubmitted(true); }} className="glass-effect space-y-12 rounded-[3.5rem] p-6 sm:p-14 shadow-2xl border border-white/20">
               
               {/* 1. DADOS PESSOAIS */}
               <div className="space-y-8">
-                <h2 className="text-2xl font-black text-slate-800 uppercase flex items-center border-b-2 pb-4 border-slate-100">
-                  <span className="text-orange-500 mr-3 bg-orange-50 p-2.5 rounded-xl shadow-sm"><IconUser /></span> 1. Identificação
+                <h2 className="text-2xl font-black text-slate-900 uppercase flex items-center border-b-4 pb-4 border-slate-200">
+                  <span className="text-orange-600 mr-3 bg-orange-100 p-2.5 rounded-2xl shadow-sm"><IconUser /></span> 1. Identificação
                 </h2>
-                <div className="grid grid-cols-1 gap-5">
+                <div className="grid grid-cols-1 gap-6">
                   <div className="group">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2 mb-1 block">Nome Completo</label>
-                    <input type="text" placeholder="Insira o seu nome completo" required className="w-full p-5 rounded-2xl border-2 border-slate-100 focus:border-blue-500 outline-none bg-slate-50/50 font-semibold transition-all group-hover:bg-white" onChange={e => setFormData({...formData, nome: e.target.value})} />
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-700 ml-2 mb-1 block">Nome Completo</label>
+                    <input type="text" placeholder="Insira o seu nome completo" required className="w-full p-5 rounded-2xl border-2 border-slate-200 focus:border-blue-600 outline-none bg-slate-50 font-bold transition-all placeholder:text-slate-400 text-slate-900" onChange={e => setFormData({...formData, nome: e.target.value})} />
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2 mb-1 block">E-mail</label>
-                      <input type="email" placeholder="seu@email.com" required className="w-full p-5 rounded-2xl border-2 border-slate-100 outline-none bg-slate-50/50 font-semibold" onChange={e => setFormData({...formData, email: e.target.value})} />
+                      <label className="text-xs font-black uppercase tracking-widest text-slate-700 ml-2 mb-1 block">E-mail</label>
+                      <input type="email" placeholder="seu@email.com" required className="w-full p-5 rounded-2xl border-2 border-slate-200 outline-none bg-slate-50 font-bold text-slate-900" onChange={e => setFormData({...formData, email: e.target.value})} />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2 mb-1 block">Telefone / WhatsApp</label>
-                      <input type="tel" placeholder="(00) 00000-0000" required className="w-full p-5 rounded-2xl border-2 border-slate-100 outline-none bg-slate-50/50 font-semibold" onChange={e => setFormData({...formData, telefone: e.target.value})} />
+                      <label className="text-xs font-black uppercase tracking-widest text-slate-700 ml-2 mb-1 block">Telefone / WhatsApp</label>
+                      <input type="tel" placeholder="(00) 00000-0000" required className="w-full p-5 rounded-2xl border-2 border-slate-200 outline-none bg-slate-50 font-bold text-slate-900" onChange={e => setFormData({...formData, telefone: e.target.value})} />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2 mb-1 block">CPF</label>
-                      <input type="text" placeholder="000.000.000-00" required className="w-full p-5 rounded-2xl border-2 border-slate-100 outline-none bg-slate-50/50 font-semibold" onChange={e => setFormData({...formData, cpf: e.target.value})} />
+                      <label className="text-xs font-black uppercase tracking-widest text-slate-700 ml-2 mb-1 block">CPF</label>
+                      <input type="text" placeholder="000.000.000-00" required className="w-full p-5 rounded-2xl border-2 border-slate-200 outline-none bg-slate-50 font-bold text-slate-900" onChange={e => setFormData({...formData, cpf: e.target.value})} />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2 mb-1 block">RA</label>
-                      <input type="text" placeholder="Registo Académico" required className="w-full p-5 rounded-2xl border-2 border-slate-100 outline-none bg-slate-50/50 font-semibold" onChange={e => setFormData({...formData, ra: e.target.value})} />
+                      <label className="text-xs font-black uppercase tracking-widest text-slate-700 ml-2 mb-1 block">RA</label>
+                      <input type="text" placeholder="Registo Académico" required className="w-full p-5 rounded-2xl border-2 border-slate-200 outline-none bg-slate-50 font-bold text-slate-900" onChange={e => setFormData({...formData, ra: e.target.value})} />
                     </div>
                   </div>
                 </div>
@@ -151,20 +147,20 @@
 
               {/* 2. ANO E CURSO */}
               <div className="space-y-8">
-                <h3 className="font-black text-slate-400 text-xs uppercase tracking-widest text-center">Ano e Curso Técnico</h3>
+                <h3 className="font-black text-slate-600 text-sm uppercase tracking-widest text-center underline decoration-blue-500 decoration-4 underline-offset-8">Ano e Curso Técnico</h3>
                 <div className="grid grid-cols-2 gap-4 text-center">
                   {['2º Ano', '3º Ano'].map(a => (
-                    <label key={a} className={`p-5 border-2 rounded-2xl cursor-pointer font-black transition-all text-lg ${formData.ano === a ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105' : 'bg-white text-slate-300 border-slate-100 hover:bg-slate-50'}`}>
+                    <label key={a} className={`p-6 border-4 rounded-3xl cursor-pointer font-black transition-all text-xl ${formData.ano === a ? 'bg-blue-600 border-blue-600 text-white shadow-2xl scale-105' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}>
                       <input type="radio" name="ano" className="sr-only" required onChange={() => setFormData({...formData, ano: a})} /> {a}
                     </label>
                   ))}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {/* ADMINISTRAÇÃO - USANDO LOGO PNG */}
-                  <label className={`flex flex-col items-center p-8 border-2 rounded-[2.5rem] cursor-pointer transition-all ${formData.curso === 'ADM' ? 'bg-blue-600 border-blue-600 text-white shadow-2xl scale-[1.03]' : 'bg-white text-slate-400 border-slate-100 hover:border-blue-200'}`}>
+                  {/* ADMINISTRAÇÃO */}
+                  <label className={`flex flex-col items-center p-8 border-4 rounded-[3rem] cursor-pointer transition-all ${formData.curso === 'ADM' ? 'bg-blue-600 border-blue-600 text-white shadow-2xl scale-[1.03]' : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'}`}>
                     <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'ADM', empresasRank: []})} />
-                    <div className="mb-5 w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center p-2 rounded-2xl transition-colors">
+                    <div className="mb-5 w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center p-4 rounded-3xl bg-white/10">
                         <img 
                             src="./logo_adm.png" 
                             alt="ADM" 
@@ -172,13 +168,13 @@
                             onError={(e) => handleImageError(e, 'ADM')}
                         />
                     </div>
-                    <span className="text-xl font-black uppercase tracking-tighter">Administração</span>
+                    <span className="text-2xl font-black uppercase tracking-tighter">Administração</span>
                   </label>
 
-                  {/* AGRONEGÓCIO - USANDO LOGO PNG */}
-                  <label className={`flex flex-col items-center p-8 border-2 rounded-[2.5rem] cursor-pointer transition-all ${formData.curso === 'AGRO' ? 'bg-orange-600 border-orange-600 text-white shadow-2xl scale-[1.03]' : 'bg-white text-slate-400 border-slate-100 hover:border-orange-200'}`}>
+                  {/* AGRONEGÓCIO */}
+                  <label className={`flex flex-col items-center p-8 border-4 rounded-[3rem] cursor-pointer transition-all ${formData.curso === 'AGRO' ? 'bg-orange-600 border-orange-600 text-white shadow-2xl scale-[1.03]' : 'bg-white text-slate-700 border-slate-200 hover:border-orange-400'}`}>
                     <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'AGRO', empresasRank: ['prefeitura']})} />
-                    <div className="mb-5 w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center p-2 rounded-2xl transition-colors">
+                    <div className="mb-5 w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center p-4 rounded-3xl bg-white/10">
                         <img 
                             src="./logo_agro.png" 
                             alt="AGRO" 
@@ -186,19 +182,19 @@
                             onError={(e) => handleImageError(e, 'AGRO')}
                         />
                     </div>
-                    <span className="text-xl font-black uppercase tracking-tighter">Agronegócio</span>
+                    <span className="text-2xl font-black uppercase tracking-tighter">Agronegócio</span>
                   </label>
                 </div>
               </div>
 
               {/* 3. OPÇÃO DE ESTÁGIO */}
               <div className="space-y-8">
-                <h2 className="text-2xl font-black text-slate-800 uppercase flex items-center border-b-2 pb-4 border-slate-100">
-                  <span className="text-orange-500 mr-3 bg-orange-50 p-2.5 rounded-xl shadow-sm"><IconBriefcase /></span> 2. Estágio
+                <h2 className="text-2xl font-black text-slate-900 uppercase flex items-center border-b-4 pb-4 border-slate-200">
+                  <span className="text-orange-600 mr-3 bg-orange-100 p-2.5 rounded-2xl shadow-sm"><IconBriefcase /></span> 2. Estágio
                 </h2>
                 <div className="flex gap-4">
                   {['SIM', 'NÃO'].map(opt => (
-                    <label key={opt} className={`flex-1 p-5 border-2 rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${formData.interesse === opt ? 'bg-slate-800 border-slate-800 text-white shadow-xl' : 'bg-white text-slate-300 border-slate-100'}`}>
+                    <label key={opt} className={`flex-1 p-6 border-4 rounded-3xl cursor-pointer text-center font-black text-xl transition-all ${formData.interesse === opt ? 'bg-slate-900 border-slate-900 text-white shadow-2xl' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}>
                       <input type="radio" name="interesse" className="sr-only" required onChange={() => setFormData({...formData, interesse: opt})} /> {opt === 'SIM' ? 'QUERO ESTAGIAR' : 'NÃO NO MOMENTO'}
                     </label>
                   ))}
@@ -210,28 +206,28 @@
                 <div className="space-y-12 animate-pop pt-4">
                   
                   {/* CÓDIGO CIEE */}
-                  <div className="bg-blue-50/50 p-8 rounded-[2rem] border-2 border-blue-100 shadow-inner">
-                    <label className="block text-xs font-black text-blue-900 mb-3 uppercase tracking-widest text-center">Código de Cadastro CIEE *</label>
-                    <input type="text" placeholder="Digite o seu código CIEE aqui" required className="w-full p-5 rounded-2xl border-2 border-white outline-none focus:border-blue-500 font-bold text-center text-blue-900 shadow-sm" onChange={e => setFormData({...formData, codigoCiee: e.target.value})} />
+                  <div className="bg-blue-50/50 p-10 rounded-[2.5rem] border-4 border-blue-200 shadow-inner">
+                    <label className="block text-sm font-black text-blue-900 mb-4 uppercase tracking-widest text-center">Código de Cadastro CIEE *</label>
+                    <input type="text" placeholder="Digite o seu código CIEE aqui" required className="w-full p-6 rounded-2xl border-2 border-white outline-none focus:border-blue-600 font-black text-center text-blue-900 shadow-sm text-lg" onChange={e => setFormData({...formData, codigoCiee: e.target.value})} />
                   </div>
 
                   {/* RANKING EMPRESAS */}
-                  <div className="space-y-6">
-                    <h3 className="font-black text-slate-700 uppercase flex items-center tracking-tight text-xl">
-                       <span className="text-blue-600 mr-2 bg-blue-50 p-2 rounded-lg"><IconBuilding /></span> 3. Prioridade de Empresa
+                  <div className="space-y-8">
+                    <h3 className="font-black text-slate-800 uppercase flex items-center tracking-tight text-2xl">
+                       <span className="text-blue-600 mr-2 bg-blue-100 p-3 rounded-2xl shadow-sm"><IconBuilding /></span> 3. Prioridade de Empresa
                     </h3>
                     
                     {formData.curso === 'AGRO' ? (
-                      <div className="p-8 bg-green-50 border-2 border-green-200 rounded-[2rem] text-green-800 font-bold text-center shadow-sm">
-                        Para o curso de Agronegócio, a empresa disponível para parceria é a <span className="underline">Prefeitura</span>.
+                      <div className="p-10 bg-green-50 border-4 border-green-200 rounded-[2.5rem] text-green-900 font-black text-center shadow-md text-lg">
+                        Para o curso de Agronegócio, a empresa disponível para parceria é a <span className="underline decoration-green-500 decoration-4 underline-offset-4">Prefeitura</span>.
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-4 sm:gap-6">
                         {todasEmpresas.map(emp => {
                           const rank = formData.empresasRank.indexOf(emp.id);
                           return (
-                            <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 3)} className={`relative p-6 border-2 rounded-[2rem] cursor-pointer text-center font-black transition-all ${rank !== -1 ? 'border-orange-500 bg-orange-50 text-orange-900 shadow-xl transform scale-105' : 'bg-white text-slate-300 border-slate-100 hover:border-blue-200'}`}>
-                              {rank !== -1 && <span className="absolute -top-3 -right-3 bg-orange-600 text-white w-9 h-9 rounded-full flex items-center justify-center text-xs font-black shadow-lg animate-bounce">{rank + 1}º</span>}
+                            <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 3)} className={`relative p-8 border-4 rounded-[2.5rem] cursor-pointer text-center font-black text-xl transition-all ${rank !== -1 ? 'border-orange-500 bg-orange-600 text-white shadow-2xl transform scale-105' : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'}`}>
+                              {rank !== -1 && <span className="absolute -top-4 -right-4 bg-white text-orange-600 w-12 h-12 rounded-full flex items-center justify-center text-xl font-black shadow-xl border-4 border-orange-500 animate-bounce">{rank + 1}º</span>}
                               {emp.label}
                             </div>
                           );
@@ -242,14 +238,14 @@
 
                   {/* SETORES (ADM) */}
                   {formData.curso === 'ADM' && formData.empresasRank.includes('prefeitura') && (
-                    <div className="p-10 bg-slate-50 rounded-[3rem] border-2 border-slate-100 space-y-6 shadow-inner">
-                      <p className="font-black text-slate-500 uppercase text-xs tracking-widest text-center">Indique as áreas de interesse na Prefeitura (Escolha 2)</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div className="p-10 bg-slate-50 rounded-[3rem] border-4 border-slate-200 space-y-8 shadow-inner">
+                      <p className="font-black text-slate-700 uppercase text-sm tracking-widest text-center">Indique as áreas de interesse na Prefeitura (Escolha 2)</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                         {areasPrefeitura.map(a => {
                           const rank = formData.prefeituraRank.indexOf(a.id);
                           return (
-                            <div key={a.id} onClick={() => handleRanking('prefeituraRank', a.id, 2)} className={`relative p-4 border-2 rounded-2xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'border-blue-600 bg-blue-600 text-white shadow-lg' : 'bg-white border-white text-slate-300 hover:border-blue-100'}`}>
-                              {rank !== -1 && <span className="absolute -top-2 -right-2 bg-white text-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-blue-600">{rank + 1}º</span>}
+                            <div key={a.id} onClick={() => handleRanking('prefeituraRank', a.id, 2)} className={`relative p-5 border-4 rounded-2xl cursor-pointer text-center text-sm font-black transition-all ${rank !== -1 ? 'border-blue-600 bg-blue-600 text-white shadow-xl' : 'bg-white border-slate-200 text-slate-700 hover:border-blue-300'}`}>
+                              {rank !== -1 && <span className="absolute -top-2 -right-2 bg-white text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border-4 border-blue-600">{rank + 1}º</span>}
                               {a.label}
                             </div>
                           );
@@ -260,14 +256,14 @@
                 </div>
               )}
 
-              <div className="pt-6">
-                <button type="submit" className="w-full py-7 bg-orange-600 hover:bg-orange-700 text-white text-2xl font-black rounded-[2.5rem] transition-all shadow-2xl shadow-orange-600/40 active:scale-95 uppercase tracking-widest">
+              <div className="pt-8">
+                <button type="submit" className="w-full py-8 bg-orange-600 hover:bg-orange-700 text-white text-3xl font-black rounded-[3rem] transition-all shadow-2xl shadow-orange-600/50 active:scale-95 uppercase tracking-widest drop-shadow-lg">
                   Enviar Questionário
                 </button>
               </div>
             </form>
             
-            <p className="text-center text-white/60 text-xs mt-12 font-medium tracking-widest uppercase">&copy; 2026 Escola Coronel Castanho de Almeida • Guareí/SP</p>
+            <p className="text-center text-white font-black text-sm mt-12 tracking-widest uppercase drop-shadow-md">&copy; 2026 Escola Coronel Castanho de Almeida • Guareí/SP</p>
           </div>
         </div>
       );
