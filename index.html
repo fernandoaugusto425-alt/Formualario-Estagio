@@ -25,8 +25,12 @@
       0% { transform: scale(0.95); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
-    /* Classe para forçar o laranja e negrito solicitado */
-    .text-orange-bold {
+    /* Texto dentro das caixas: Laranja e Negrito */
+    input::placeholder {
+      color: #64748b !important;
+      font-weight: 400;
+    }
+    input {
       color: #ea580c !important; /* Orange 600 */
       font-weight: 900 !important;
     }
@@ -38,9 +42,9 @@
   <script type="text/babel">
     const { useState } = React;
 
-    const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-    const IconBriefcase = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
-    const IconBuilding = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>;
+    const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+    const IconBriefcase = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
+    const IconBuilding = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>;
     const IconCheck = () => <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"><path d="M20 6L9 17l-5-5"/></svg>;
 
     function App() {
@@ -71,6 +75,9 @@
         { id: 'v_merch', label: 'Visual Merch.' }
       ];
 
+      // Validação do Código CIEE (7 dígitos alfanuméricos)
+      const isCieeValid = /^[a-zA-Z0-9]{7}$/.test(formData.codigoCiee);
+
       const handleRanking = (listName, id, max) => {
         let current = [...formData[listName]];
         if (current.includes(id)) {
@@ -81,12 +88,6 @@
         setFormData({...formData, [listName]: current});
       };
 
-      const handleImageError = (e) => {
-        const currentSrc = e.target.src;
-        if (currentSrc.includes('logo.png')) e.target.src = './logo.jpg';
-        else e.target.src = 'https://via.placeholder.com/150?text=LOGO';
-      };
-
       if (isSubmitted) {
         return (
           <div className="min-h-screen flex items-center justify-center p-4">
@@ -94,64 +95,63 @@
               <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                 <IconCheck />
               </div>
-              <h2 className="text-3xl font-black text-orange-600 mb-2 uppercase tracking-tighter">Enviado!</h2>
-              <p className="text-orange-700 mb-8 font-black">Questionário registado com sucesso.</p>
-              <button onClick={() => window.location.reload()} className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl shadow-lg transition-all active:scale-95 uppercase">Voltar ao Início</button>
+              <h2 className="text-3xl font-black text-black mb-2 uppercase tracking-tighter">Enviado!</h2>
+              <p className="text-slate-700 mb-8 font-bold text-lg italic">Obrigado! O teu questionário foi registado.</p>
+              <button onClick={() => window.location.reload()} className="w-full py-4 bg-black hover:bg-slate-800 text-white font-black rounded-2xl shadow-lg transition-all active:scale-95 uppercase">Voltar ao Início</button>
             </div>
           </div>
         );
       }
 
       return (
-        <div className="py-4 px-4">
+        <div className="py-6 px-4">
           <div className="max-w-3xl mx-auto">
             
-            {/* CABEÇALHO */}
-            <div className="text-center mb-4">
+            <div className="text-center mb-6">
               <div className="mb-2">
                 <img 
                   src="./logo.png" 
                   alt="Logo Escola" 
                   className="mx-auto w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-2xl transition-transform hover:scale-105 duration-300"
-                  onError={handleImageError}
+                  onError={(e) => e.target.src='https://via.placeholder.com/150?text=LOGO'}
                 />
               </div>
-              <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-xl text-center">Questionário Alunos Técnico</h1>
-              <p className="text-orange-100 font-black opacity-100 mt-1 tracking-wide italic text-base sm:text-lg drop-shadow-md text-center uppercase">Coronel Castanho de Almeida • 2026</p>
+              <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-xl">Questionário Alunos Técnico</h1>
+              <p className="text-white font-black opacity-100 mt-1 tracking-wide italic text-base sm:text-lg drop-shadow-md">Coronel Castanho de Almeida • 2026</p>
             </div>
 
             <form onSubmit={(e) => { e.preventDefault(); setIsSubmitted(true); }} className="glass-effect space-y-8 rounded-[2.5rem] p-6 sm:p-12 shadow-2xl border border-white/20">
               
               {/* 1. IDENTIFICAÇÃO */}
               <div className="space-y-6">
-                <h2 className="text-2xl font-black text-orange-600 uppercase flex items-center border-b-4 pb-3 border-orange-100">
-                  <span className="text-white mr-3 bg-orange-500 p-2 rounded-xl shadow-sm"><IconUser /></span> 1. Identificação
+                <h2 className="text-xl font-black text-black uppercase flex items-center border-b-4 pb-3 border-black">
+                  <span className="mr-3 p-2 bg-slate-100 rounded-xl"><IconUser /></span> 1. Identificação
                 </h2>
-                <div className="grid grid-cols-1 gap-4 font-black">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="text-xs uppercase tracking-widest text-orange-600 ml-2 mb-1 block">Nome Completo</label>
-                    <input type="text" placeholder="Insira o seu nome" required className="w-full p-4 rounded-2xl border-2 border-orange-200 focus:border-orange-500 outline-none bg-orange-50/30 text-orange-700 placeholder:text-orange-300" onChange={e => setFormData({...formData, nome: e.target.value})} />
+                    <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">Nome Completo</label>
+                    <input type="text" placeholder="Insira o seu nome" required className="w-full p-4 rounded-2xl border-2 border-black focus:border-orange-500 outline-none bg-white" onChange={e => setFormData({...formData, nome: e.target.value})} />
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-orange-600 ml-2 mb-1 block">E-mail</label>
-                      <input type="email" placeholder="seu@email.com" required className="p-4 rounded-2xl border-2 border-orange-200 outline-none bg-orange-50/30 text-orange-700 placeholder:text-orange-300" onChange={e => setFormData({...formData, email: e.target.value})} />
+                      <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">E-mail</label>
+                      <input type="email" placeholder="seu@email.com" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, email: e.target.value})} />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-orange-600 ml-2 mb-1 block">Telefone</label>
-                      <input type="tel" placeholder="(00) 00000-0000" required className="p-4 rounded-2xl border-2 border-orange-200 outline-none bg-orange-50/30 text-orange-700 placeholder:text-orange-300" onChange={e => setFormData({...formData, telefone: e.target.value})} />
+                      <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">Telefone</label>
+                      <input type="tel" placeholder="(00) 00000-0000" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, telefone: e.target.value})} />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-orange-600 ml-2 mb-1 block">CPF</label>
-                      <input type="text" placeholder="000.000.000-00" required className="p-4 rounded-2xl border-2 border-orange-200 outline-none bg-orange-50/30 text-orange-700 placeholder:text-orange-300" onChange={e => setFormData({...formData, cpf: e.target.value})} />
+                      <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">CPF</label>
+                      <input type="text" placeholder="000.000.000-00" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, cpf: e.target.value})} />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-orange-600 ml-2 mb-1 block">RA</label>
-                      <input type="text" placeholder="Registo Académico" required className="p-4 rounded-2xl border-2 border-orange-200 outline-none bg-orange-50/30 text-orange-700 placeholder:text-orange-300" onChange={e => setFormData({...formData, ra: e.target.value})} />
+                      <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">RA</label>
+                      <input type="text" placeholder="Registo Académico" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, ra: e.target.value})} />
                     </div>
                   </div>
                 </div>
@@ -159,18 +159,17 @@
 
               {/* 2. ANO E CURSO */}
               <div className="space-y-6">
-                <h3 className="font-black text-orange-600 text-sm uppercase tracking-widest text-center underline decoration-orange-500 decoration-2 underline-offset-4">Ano e Curso Técnico</h3>
+                <h3 className="font-black text-black text-xs uppercase tracking-widest text-center underline decoration-black decoration-2 underline-offset-4">Ano e Curso Técnico</h3>
                 <div className="grid grid-cols-2 gap-3 text-center">
                   {['2º Ano', '3º Ano'].map(a => (
-                    <label key={a} className={`p-4 border-2 border-orange-200 rounded-2xl cursor-pointer font-black transition-all text-lg ${formData.ano === a ? 'bg-orange-600 border-orange-600 text-white shadow-lg scale-105' : 'bg-white text-orange-600 hover:bg-orange-50'}`}>
+                    <label key={a} className={`p-4 border-2 border-black rounded-2xl cursor-pointer font-black transition-all text-lg ${formData.ano === a ? 'bg-black text-white shadow-lg' : 'bg-white text-black hover:bg-slate-50'}`}>
                       <input type="radio" name="ano" className="sr-only" required onChange={() => setFormData({...formData, ano: a})} /> {a}
                     </label>
                   ))}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* ADMINISTRAÇÃO */}
-                  <label className={`flex flex-col items-center p-6 border-2 border-orange-200 rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'ADM' ? 'bg-orange-600 border-orange-600 text-white shadow-xl' : 'bg-white text-orange-600 hover:border-orange-400'}`}>
+                  <label className={`flex flex-col items-center p-6 border-2 border-black rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'ADM' ? 'bg-blue-700 border-blue-700 text-white shadow-xl' : 'bg-white text-black hover:border-blue-500'}`}>
                     <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'ADM', empresasRank: [], prefeituraRank: [], treloRank: []})} />
                     <div className="mb-4 w-20 h-20 flex items-center justify-center p-1">
                         <img src="./logo_adm.png" alt="ADM" className="w-full h-full object-contain" onError={(e) => e.target.src='https://via.placeholder.com/80?text=ADM'} />
@@ -178,8 +177,7 @@
                     <span className="text-xl font-black uppercase tracking-tighter">Administração</span>
                   </label>
 
-                  {/* AGRONEGÓCIO */}
-                  <label className={`flex flex-col items-center p-6 border-2 border-orange-200 rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'AGRO' ? 'bg-orange-600 border-orange-600 text-white shadow-xl' : 'bg-white text-orange-600 hover:border-orange-400'}`}>
+                  <label className={`flex flex-col items-center p-6 border-2 border-black rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'AGRO' ? 'bg-orange-600 border-orange-600 text-white shadow-xl' : 'bg-white text-black hover:border-orange-500'}`}>
                     <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'AGRO', empresasRank: ['prefeitura'], prefeituraRank: [], treloRank: []})} />
                     <div className="mb-4 w-20 h-20 flex items-center justify-center p-1">
                         <img src="./logo_agro.png" alt="AGRO" className="w-full h-full object-contain" onError={(e) => e.target.src='https://via.placeholder.com/80?text=AGRO'} />
@@ -191,93 +189,112 @@
 
               {/* 3. ESTÁGIO */}
               <div className="space-y-6">
-                <h2 className="text-2xl font-black text-orange-600 uppercase flex items-center border-b-4 pb-3 border-orange-100">
-                  <span className="text-white mr-3 bg-orange-500 p-2 rounded-xl shadow-sm"><IconBriefcase /></span> 2. Estágio
+                <h2 className="text-xl font-black text-black uppercase flex items-center border-b-4 pb-3 border-black">
+                  <span className="mr-3 p-2 bg-slate-100 rounded-xl"><IconBriefcase /></span> 2. Estágio
                 </h2>
                 <div className="flex gap-3">
                   {['SIM', 'NÃO'].map(opt => (
-                    <label key={opt} className={`flex-1 p-4 border-2 border-orange-200 rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${formData.interesse === opt ? 'bg-orange-600 border-orange-600 text-white shadow-lg' : 'bg-white text-orange-600 hover:bg-orange-50'}`}>
+                    <label key={opt} className={`flex-1 p-4 border-2 border-black rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${formData.interesse === opt ? 'bg-black text-white shadow-lg' : 'bg-white text-black hover:bg-slate-50'}`}>
                       <input type="radio" name="interesse" className="sr-only" required onChange={() => setFormData({...formData, interesse: opt})} /> {opt === 'SIM' ? 'QUERO' : 'NÃO'}
                     </label>
                   ))}
                 </div>
               </div>
 
-              {/* CONTEÚDO DINÂMICO */}
+              {/* CONTEÚDO CONDICIONAL - BLOQUEADO POR CIEE */}
               {formData.interesse === 'SIM' && (
                 <div className="space-y-10 animate-pop pt-2">
                   
-                  <div className="bg-orange-50 p-6 rounded-[2rem] border-2 border-orange-200 shadow-inner text-center">
-                    <label className="block text-xs font-black text-orange-700 mb-3 uppercase tracking-widest">Código de Cadastro CIEE *</label>
-                    <input type="text" placeholder="Digite o seu código CIEE" required className="w-full p-4 rounded-xl border-2 border-white outline-none focus:border-orange-600 font-black text-center text-orange-800" onChange={e => setFormData({...formData, codigoCiee: e.target.value})} />
-                  </div>
-
-                  <div className="space-y-6">
-                    <h3 className="font-black text-orange-600 uppercase flex items-center tracking-tight text-xl">
-                       <span className="text-white mr-2 bg-orange-500 p-2 rounded-lg shadow-sm"><IconBuilding /></span> 3. Prioridade de Empresa
-                    </h3>
-                    
-                    {formData.curso === 'AGRO' ? (
-                      <div className="p-8 bg-orange-50 border-2 border-orange-200 rounded-[2rem] text-orange-950 font-black text-center shadow-md">
-                        <p className="text-sm text-orange-600 mb-2 uppercase tracking-widest">Opção única para Agronegócio:</p>
-                        <div className="p-5 bg-white border-2 border-orange-500 rounded-2xl text-2xl text-orange-600">1º PREFEITURA</div>
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-xs font-black text-orange-400 mb-2 uppercase tracking-wide">Classifique por ordem de preferência (1º ao 4º):</p>
-                        <div className="grid grid-cols-2 gap-4">
-                          {todasEmpresas.map(emp => {
-                            const rank = formData.empresasRank.indexOf(emp.id);
-                            return (
-                              <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 4)} className={`relative p-5 border-2 border-orange-200 rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${rank !== -1 ? 'border-orange-600 bg-orange-600 text-white shadow-xl scale-105' : 'bg-white text-orange-600 hover:border-orange-300'}`}>
-                                {rank !== -1 && <span className="absolute -top-3 -right-3 bg-white text-orange-600 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shadow-xl border-2 border-orange-600 animate-bounce">{rank + 1}º</span>}
-                                {emp.label}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </>
+                  <div className="bg-slate-50 p-6 rounded-[2rem] border-2 border-black shadow-inner text-center">
+                    <label className="block text-xs font-black text-black mb-3 uppercase tracking-widest">Código de Cadastro CIEE (7 Dígitos) *</label>
+                    <input 
+                      type="text" 
+                      placeholder="Ex: A1B2C3D" 
+                      maxLength="7"
+                      required 
+                      className="w-full p-4 rounded-xl border-2 border-black outline-none focus:border-orange-500 font-black text-center uppercase" 
+                      onChange={e => setFormData({...formData, codigoCiee: e.target.value})} 
+                    />
+                    {!isCieeValid && formData.codigoCiee.length > 0 && (
+                      <p className="text-xs text-red-600 mt-2 font-bold animate-pulse italic">O código deve ter exatamente 7 letras ou números.</p>
                     )}
                   </div>
 
-                  {/* SETORES (ADM APENAS) */}
-                  {formData.curso === 'ADM' && formData.empresasRank.includes('prefeitura') && (
-                    <div className="p-8 bg-orange-50/50 rounded-[2rem] border-2 border-orange-200 space-y-6 shadow-inner animate-pop">
-                      <p className="font-black text-orange-600 uppercase text-xs tracking-widest text-center">Classifique os Setores da Prefeitura</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {areasPrefeitura.map(a => {
-                          const rank = formData.prefeituraRank.indexOf(a.id);
-                          return (
-                            <div key={a.id} onClick={() => handleRanking('prefeituraRank', a.id, areasPrefeitura.length)} className={`relative p-3 border-2 border-orange-200 rounded-xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'border-orange-600 bg-orange-600 text-white shadow-xl' : 'bg-white text-orange-600 hover:border-orange-400'}`}>
-                              {rank !== -1 && <span className="absolute -top-1.5 -right-1.5 bg-white text-orange-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-orange-600">{rank + 1}º</span>}
-                              {a.label}
+                  {/* LIBERADO APENAS SE CIEE FOR VÁLIDO */}
+                  {isCieeValid ? (
+                    <div className="animate-pop space-y-10">
+                      <div className="space-y-6">
+                        <h3 className="font-black text-black uppercase flex items-center tracking-tight text-xl">
+                          <span className="mr-2 p-2 bg-slate-100 rounded-lg"><IconBuilding /></span> 3. Prioridade de Empresa
+                        </h3>
+                        
+                        {formData.curso === 'AGRO' ? (
+                          <div className="p-8 bg-green-50 border-2 border-black rounded-[2rem] text-black font-black text-center shadow-md">
+                            <p className="text-sm uppercase tracking-widest mb-2">Opção única para Agronegócio:</p>
+                            <div className="p-5 bg-white border-2 border-green-500 rounded-2xl text-2xl text-orange-600">1º PREFEITURA</div>
+                          </div>
+                        ) : (
+                          <>
+                            <p className="text-xs font-black text-slate-500 mb-2 uppercase">Classifique por ordem de preferência (1º ao 4º):</p>
+                            <div className="grid grid-cols-2 gap-4">
+                              {todasEmpresas.map(emp => {
+                                const rank = formData.empresasRank.indexOf(emp.id);
+                                return (
+                                  <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 4)} className={`relative p-5 border-2 border-black rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${rank !== -1 ? 'bg-orange-600 border-black text-white shadow-xl scale-105' : 'bg-white text-black hover:border-orange-400'}`}>
+                                    {rank !== -1 && <span className="absolute -top-3 -right-3 bg-black text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-black border-2 border-white animate-bounce">{rank + 1}º</span>}
+                                    {emp.label}
+                                  </div>
+                                );
+                              })}
                             </div>
-                          );
-                        })}
+                          </>
+                        )}
                       </div>
-                    </div>
-                  )}
 
-                  {formData.curso === 'ADM' && formData.empresasRank.includes('trelo') && (
-                    <div className="p-8 bg-orange-50/50 rounded-[2rem] border-2 border-orange-200 space-y-6 shadow-inner animate-pop">
-                      <p className="font-black text-orange-600 uppercase text-xs tracking-widest text-center">Classifique os Setores da Trelo</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
-                        {areasTrelo.map(a => {
-                          const rank = formData.treloRank.indexOf(a.id);
-                          return (
-                            <div key={a.id} onClick={() => handleRanking('treloRank', a.id, areasTrelo.length)} className={`relative p-3 border-2 border-orange-200 rounded-xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'border-orange-600 bg-orange-600 text-white shadow-xl' : 'bg-white text-orange-600 hover:border-orange-400'}`}>
-                              {rank !== -1 && <span className="absolute -top-1.5 -right-1.5 bg-white text-orange-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-orange-600">{rank + 1}º</span>}
-                              {a.label}
-                            </div>
-                          );
-                        })}
-                      </div>
+                      {/* SETORES (ADM APENAS) */}
+                      {formData.curso === 'ADM' && formData.empresasRank.includes('prefeitura') && (
+                        <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-black space-y-6 shadow-inner animate-pop">
+                          <p className="font-black text-black uppercase text-xs tracking-widest text-center">Classifique os Setores da Prefeitura</p>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {areasPrefeitura.map(a => {
+                              const rank = formData.prefeituraRank.indexOf(a.id);
+                              return (
+                                <div key={a.id} onClick={() => handleRanking('prefeituraRank', a.id, areasPrefeitura.length)} className={`relative p-3 border-2 border-black rounded-xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'bg-blue-700 text-white shadow-xl' : 'bg-white text-black hover:border-blue-500'}`}>
+                                  {rank !== -1 && <span className="absolute -top-1.5 -right-1.5 bg-black text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white">{rank + 1}º</span>}
+                                  {a.label}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {formData.curso === 'ADM' && formData.empresasRank.includes('trelo') && (
+                        <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-black space-y-6 shadow-inner animate-pop">
+                          <p className="font-black text-black uppercase text-xs tracking-widest text-center">Classifique os Setores da Trelo</p>
+                          <div className="grid grid-cols-2 gap-3">
+                            {areasTrelo.map(a => {
+                              const rank = formData.treloRank.indexOf(a.id);
+                              return (
+                                <div key={a.id} onClick={() => handleRanking('treloRank', a.id, areasTrelo.length)} className={`relative p-3 border-2 border-black rounded-xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'bg-blue-700 text-white shadow-xl' : 'bg-white text-black hover:border-blue-500'}`}>
+                                  {rank !== -1 && <span className="absolute -top-1.5 -right-1.5 bg-black text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white">{rank + 1}º</span>}
+                                  {a.label}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-8 border-2 border-black border-dashed rounded-[2rem] text-center opacity-50 bg-slate-100">
+                      <p className="font-black text-black uppercase text-xs tracking-widest italic">Aguardando código CIEE válido para liberar escolhas...</p>
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="pt-4">
+              <div className="pt-4 text-center">
                 <button type="submit" className="w-full py-6 bg-orange-600 hover:bg-orange-700 text-white text-2xl font-black rounded-[2rem] transition-all shadow-xl shadow-orange-600/50 active:scale-95 uppercase tracking-widest">
                   Enviar Questionário
                 </button>
