@@ -25,6 +25,10 @@
       0% { transform: scale(0.95); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
+    /* Forçar letras bem escuras em todos os inputs e botões */
+    .text-dark-important {
+      color: #020617 !important;
+    }
   </style>
 </head>
 <body class="antialiased font-sans school-bg min-h-screen">
@@ -33,12 +37,11 @@
   <script type="text/babel">
     const { useState } = React;
 
-    // Ícones SVG
-    const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-    const IconBriefcase = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
-    const IconBuilding = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>;
+    const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+    const IconBriefcase = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
+    const IconBuilding = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>;
     const IconCheck = () => <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"><path d="M20 6L9 17l-5-5"/></svg>;
-    
+
     function App() {
       const [isSubmitted, setIsSubmitted] = useState(false);
       const [formData, setFormData] = useState({
@@ -78,35 +81,37 @@
       };
 
       const handleImageError = (e) => {
-        e.target.src = `https://via.placeholder.com/150?text=LOGO`;
+        const currentSrc = e.target.src;
+        if (currentSrc.includes('logo.png')) e.target.src = './logo.jpg';
+        else e.target.src = 'https://via.placeholder.com/150?text=LOGO';
       };
 
       if (isSubmitted) {
         return (
           <div className="min-h-screen flex items-center justify-center p-4">
             <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center animate-pop border-t-8 border-orange-500">
-              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <IconCheck />
               </div>
-              <h2 className="text-3xl font-black text-slate-950 mb-2 uppercase tracking-tighter text-center">Enviado!</h2>
-              <p className="text-slate-800 mb-8 text-lg font-bold text-center">Obrigado, {formData.nome.split(' ')[0]}! O teu questionário foi registado.</p>
-              <button onClick={() => window.location.reload()} className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest text-center">Voltar ao Início</button>
+              <h2 className="text-3xl font-black text-slate-950 mb-2 uppercase">Enviado!</h2>
+              <p className="text-slate-900 mb-8 text-lg font-bold">Questionário registado com sucesso.</p>
+              <button onClick={() => window.location.reload()} className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl shadow-lg transition-all active:scale-95 uppercase">Voltar ao Início</button>
             </div>
           </div>
         );
       }
 
       return (
-        <div className="py-6 px-4">
+        <div className="py-4 px-4">
           <div className="max-w-3xl mx-auto">
             
-            {/* CABEÇALHO - LOGO SOLTA */}
-            <div className="text-center mb-6">
+            {/* CABEÇALHO - LOGO COMPACTA SEM CÍRCULO */}
+            <div className="text-center mb-4">
               <div className="mb-2">
                 <img 
                   src="./logo.png" 
                   alt="Logo Escola" 
-                  className="mx-auto w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-transform hover:scale-105 duration-300"
+                  className="mx-auto w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-2xl transition-transform hover:scale-105 duration-300"
                   onError={handleImageError}
                 />
               </div>
@@ -116,22 +121,22 @@
 
             <form onSubmit={(e) => { e.preventDefault(); setIsSubmitted(true); }} className="glass-effect space-y-8 rounded-[2.5rem] p-6 sm:p-12 shadow-2xl border border-white/20">
               
-              {/* 1. DADOS PESSOAIS */}
+              {/* 1. IDENTIFICAÇÃO */}
               <div className="space-y-6">
                 <h2 className="text-xl font-black text-slate-950 uppercase flex items-center border-b-4 pb-3 border-slate-200">
                   <span className="text-orange-600 mr-3 bg-orange-100 p-2 rounded-xl shadow-sm"><IconUser /></span> 1. Identificação
                 </h2>
-                <div className="grid grid-cols-1 gap-4 text-slate-950 font-black">
-                  <input type="text" placeholder="Nome Completo" required className="w-full p-4 rounded-2xl border-2 border-slate-300 focus:border-blue-600 outline-none bg-slate-50 placeholder:text-slate-500" onChange={e => setFormData({...formData, nome: e.target.value})} />
+                <div className="grid grid-cols-1 gap-4 font-black">
+                  <input type="text" placeholder="Nome Completo" required className="w-full p-4 rounded-2xl border-2 border-slate-400 focus:border-blue-600 outline-none bg-slate-50 text-slate-950 placeholder:text-slate-500" onChange={e => setFormData({...formData, nome: e.target.value})} />
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input type="email" placeholder="E-mail" required className="p-4 rounded-2xl border-2 border-slate-300 outline-none bg-slate-50" onChange={e => setFormData({...formData, email: e.target.value})} />
-                    <input type="tel" placeholder="Telefone / WhatsApp" required className="p-4 rounded-2xl border-2 border-slate-300 outline-none bg-slate-50" onChange={e => setFormData({...formData, telefone: e.target.value})} />
+                    <input type="email" placeholder="E-mail" required className="p-4 rounded-2xl border-2 border-slate-400 outline-none bg-slate-50 text-slate-950 placeholder:text-slate-500" onChange={e => setFormData({...formData, email: e.target.value})} />
+                    <input type="tel" placeholder="Telefone / WhatsApp" required className="p-4 rounded-2xl border-2 border-slate-400 outline-none bg-slate-50 text-slate-950 placeholder:text-slate-500" onChange={e => setFormData({...formData, telefone: e.target.value})} />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input type="text" placeholder="CPF" required className="p-4 rounded-2xl border-2 border-slate-300 outline-none bg-slate-50" onChange={e => setFormData({...formData, cpf: e.target.value})} />
-                    <input type="text" placeholder="RA" required className="p-4 rounded-2xl border-2 border-slate-300 outline-none bg-slate-50" onChange={e => setFormData({...formData, ra: e.target.value})} />
+                    <input type="text" placeholder="CPF" required className="p-4 rounded-2xl border-2 border-slate-400 outline-none bg-slate-50 text-slate-950 placeholder:text-slate-500" onChange={e => setFormData({...formData, cpf: e.target.value})} />
+                    <input type="text" placeholder="RA" required className="p-4 rounded-2xl border-2 border-slate-400 outline-none bg-slate-50 text-slate-950 placeholder:text-slate-500" onChange={e => setFormData({...formData, ra: e.target.value})} />
                   </div>
                 </div>
               </div>
@@ -141,52 +146,54 @@
                 <h3 className="font-black text-slate-950 text-xs uppercase tracking-widest text-center underline decoration-blue-500 decoration-2 underline-offset-4">Ano e Curso Técnico</h3>
                 <div className="grid grid-cols-2 gap-3 text-center">
                   {['2º Ano', '3º Ano'].map(a => (
-                    <label key={a} className={`p-4 border-2 rounded-2xl cursor-pointer font-black transition-all text-lg ${formData.ano === a ? 'bg-blue-700 border-blue-700 text-white shadow-lg' : 'bg-white text-slate-950 border-slate-300 hover:bg-slate-100'}`}>
+                    <label key={a} className={`p-4 border-2 border-slate-400 rounded-2xl cursor-pointer font-black transition-all text-lg ${formData.ano === a ? 'bg-blue-700 border-blue-700 text-white shadow-lg' : 'bg-white text-slate-950 hover:bg-slate-100'}`}>
                       <input type="radio" name="ano" className="sr-only" required onChange={() => setFormData({...formData, ano: a})} /> {a}
                     </label>
                   ))}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <label className={`flex flex-col items-center p-6 border-2 rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'ADM' ? 'bg-blue-700 border-blue-700 text-white shadow-xl' : 'bg-white text-slate-950 border-slate-300 hover:border-blue-500'}`}>
+                  {/* ADMINISTRAÇÃO */}
+                  <label className={`flex flex-col items-center p-6 border-2 border-slate-400 rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'ADM' ? 'bg-blue-700 border-blue-700 text-white shadow-xl' : 'bg-white text-slate-950 hover:border-blue-500'}`}>
                     <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'ADM', empresasRank: [], prefeituraRank: [], treloRank: []})} />
                     <div className="mb-4 w-20 h-20 flex items-center justify-center p-1">
                         <img src="./logo_adm.png" alt="ADM" className="w-full h-full object-contain" onError={(e) => e.target.src='https://via.placeholder.com/80?text=ADM'} />
                     </div>
-                    <span className="text-xl font-black uppercase tracking-tighter text-center">Administração</span>
+                    <span className="text-xl font-black uppercase tracking-tighter">Administração</span>
                   </label>
 
-                  <label className={`flex flex-col items-center p-6 border-2 rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'AGRO' ? 'bg-orange-600 border-orange-600 text-white shadow-xl' : 'bg-white text-slate-950 border-slate-300 hover:border-orange-500'}`}>
+                  {/* AGRONEGÓCIO */}
+                  <label className={`flex flex-col items-center p-6 border-2 border-slate-400 rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'AGRO' ? 'bg-orange-600 border-orange-600 text-white shadow-xl' : 'bg-white text-slate-950 hover:border-orange-500'}`}>
                     <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'AGRO', empresasRank: ['prefeitura'], prefeituraRank: [], treloRank: []})} />
                     <div className="mb-4 w-20 h-20 flex items-center justify-center p-1">
                         <img src="./logo_agro.png" alt="AGRO" className="w-full h-full object-contain" onError={(e) => e.target.src='https://via.placeholder.com/80?text=AGRO'} />
                     </div>
-                    <span className="text-xl font-black uppercase tracking-tighter text-center">Agronegócio</span>
+                    <span className="text-xl font-black uppercase tracking-tighter">Agronegócio</span>
                   </label>
                 </div>
               </div>
 
-              {/* 3. OPÇÃO DE ESTÁGIO */}
+              {/* 3. ESTÁGIO */}
               <div className="space-y-6">
-                <h2 className="text-xl font-black text-slate-950 uppercase flex items-center border-b-4 pb-3 border-slate-200 text-center">
+                <h2 className="text-xl font-black text-slate-950 uppercase flex items-center border-b-4 pb-3 border-slate-200">
                   <span className="text-orange-600 mr-3 bg-orange-100 p-2 rounded-xl shadow-sm"><IconBriefcase /></span> 2. Estágio
                 </h2>
                 <div className="flex gap-3">
                   {['SIM', 'NÃO'].map(opt => (
-                    <label key={opt} className={`flex-1 p-4 border-2 rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${formData.interesse === opt ? 'bg-slate-950 border-slate-950 text-white shadow-lg' : 'bg-white text-slate-950 border-slate-300 hover:bg-slate-100'}`}>
+                    <label key={opt} className={`flex-1 p-4 border-2 border-slate-400 rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${formData.interesse === opt ? 'bg-slate-950 border-slate-950 text-white shadow-lg' : 'bg-white text-slate-950 hover:bg-slate-100'}`}>
                       <input type="radio" name="interesse" className="sr-only" required onChange={() => setFormData({...formData, interesse: opt})} /> {opt === 'SIM' ? 'QUERO' : 'NÃO'}
                     </label>
                   ))}
                 </div>
               </div>
 
-              {/* CONTEÚDO CONDICIONAL */}
+              {/* CONTEÚDO DINÂMICO */}
               {formData.interesse === 'SIM' && (
                 <div className="space-y-10 animate-pop pt-2">
                   
                   <div className="bg-blue-50/50 p-6 rounded-[2rem] border-2 border-blue-200 shadow-inner text-center">
-                    <label className="block text-xs font-black text-blue-900 mb-3 uppercase tracking-widest font-black">Código de Cadastro CIEE *</label>
-                    <input type="text" placeholder="Digite o seu código CIEE" required className="w-full p-4 rounded-xl border-2 border-white outline-none focus:border-blue-600 font-black text-center text-blue-950 shadow-sm" onChange={e => setFormData({...formData, codigoCiee: e.target.value})} />
+                    <label className="block text-xs font-black text-blue-900 mb-3 uppercase tracking-widest">Código de Cadastro CIEE *</label>
+                    <input type="text" placeholder="Digite o seu código CIEE" required className="w-full p-4 rounded-xl border-2 border-white outline-none focus:border-blue-600 font-black text-center text-slate-950" onChange={e => setFormData({...formData, codigoCiee: e.target.value})} />
                   </div>
 
                   <div className="space-y-6">
@@ -196,19 +203,17 @@
                     
                     {formData.curso === 'AGRO' ? (
                       <div className="p-8 bg-green-50 border-2 border-green-200 rounded-[2rem] text-green-950 font-black text-center shadow-md">
-                        <p className="text-sm text-green-700 uppercase tracking-widest mb-2">Opção única para Agronegócio:</p>
-                        <div className="p-5 bg-white border-2 border-green-500 rounded-2xl shadow-sm text-2xl">
-                            1º PREFEITURA
-                        </div>
+                        <p className="text-sm text-green-700 mb-2">Opção única para Agronegócio:</p>
+                        <div className="p-5 bg-white border-2 border-green-500 rounded-2xl text-2xl">1º PREFEITURA</div>
                       </div>
                     ) : (
                       <>
-                        <p className="text-xs font-bold text-slate-500 mb-2">Clique para classificar todas por ordem de preferência (1º ao 4º):</p>
-                        <div className="grid grid-cols-2 gap-4 sm:gap-4">
+                        <p className="text-xs font-black text-slate-600 mb-2">Classifique todas por ordem de preferência (1º ao 4º):</p>
+                        <div className="grid grid-cols-2 gap-4">
                           {todasEmpresas.map(emp => {
                             const rank = formData.empresasRank.indexOf(emp.id);
                             return (
-                              <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 4)} className={`relative p-5 border-2 rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${rank !== -1 ? 'border-orange-500 bg-orange-600 text-white shadow-xl' : 'bg-white text-slate-950 border-slate-300 hover:border-blue-500'}`}>
+                              <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 4)} className={`relative p-5 border-2 border-slate-400 rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${rank !== -1 ? 'border-orange-500 bg-orange-600 text-white shadow-xl' : 'bg-white text-slate-950 hover:border-blue-500'}`}>
                                 {rank !== -1 && <span className="absolute -top-3 -right-3 bg-white text-orange-600 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shadow-xl border-2 border-orange-500 animate-bounce">{rank + 1}º</span>}
                                 {emp.label}
                               </div>
@@ -219,15 +224,15 @@
                     )}
                   </div>
 
-                  {/* SETORES - APENAS PARA ADMINISTRAÇÃO */}
+                  {/* SETORES (ADM APENAS) */}
                   {formData.curso === 'ADM' && formData.empresasRank.includes('prefeitura') && (
-                    <div className="p-8 bg-slate-100 rounded-[2rem] border-2 border-slate-300 space-y-6 shadow-inner animate-pop">
+                    <div className="p-8 bg-slate-100 rounded-[2rem] border-2 border-slate-400 space-y-6 shadow-inner animate-pop">
                       <p className="font-black text-slate-950 uppercase text-xs tracking-widest text-center">Classifique os Setores da Prefeitura</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {areasPrefeitura.map(a => {
                           const rank = formData.prefeituraRank.indexOf(a.id);
                           return (
-                            <div key={a.id} onClick={() => handleRanking('prefeituraRank', a.id, areasPrefeitura.length)} className={`relative p-3 border-2 rounded-xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'border-blue-700 bg-blue-700 text-white shadow-xl' : 'bg-white border-slate-300 text-slate-950 hover:border-blue-500'}`}>
+                            <div key={a.id} onClick={() => handleRanking('prefeituraRank', a.id, areasPrefeitura.length)} className={`relative p-3 border-2 border-slate-400 rounded-xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'border-blue-700 bg-blue-700 text-white shadow-xl' : 'bg-white text-slate-950 hover:border-blue-500'}`}>
                               {rank !== -1 && <span className="absolute -top-1.5 -right-1.5 bg-white text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-blue-700">{rank + 1}º</span>}
                               {a.label}
                             </div>
@@ -238,13 +243,13 @@
                   )}
 
                   {formData.curso === 'ADM' && formData.empresasRank.includes('trelo') && (
-                    <div className="p-8 bg-slate-100 rounded-[2rem] border-2 border-slate-300 space-y-6 shadow-inner animate-pop">
+                    <div className="p-8 bg-slate-100 rounded-[2rem] border-2 border-slate-400 space-y-6 shadow-inner animate-pop">
                       <p className="font-black text-slate-950 uppercase text-xs tracking-widest text-center">Classifique os Setores da Trelo</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
                         {areasTrelo.map(a => {
                           const rank = formData.treloRank.indexOf(a.id);
                           return (
-                            <div key={a.id} onClick={() => handleRanking('treloRank', a.id, areasTrelo.length)} className={`relative p-3 border-2 rounded-xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'border-blue-700 bg-blue-700 text-white shadow-xl' : 'bg-white border-slate-300 text-slate-950 hover:border-blue-500'}`}>
+                            <div key={a.id} onClick={() => handleRanking('treloRank', a.id, areasTrelo.length)} className={`relative p-3 border-2 border-slate-400 rounded-xl cursor-pointer text-center text-xs font-black transition-all ${rank !== -1 ? 'border-blue-700 bg-blue-700 text-white shadow-xl' : 'bg-white text-slate-950 hover:border-blue-500'}`}>
                               {rank !== -1 && <span className="absolute -top-1.5 -right-1.5 bg-white text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-blue-700">{rank + 1}º</span>}
                               {a.label}
                             </div>
@@ -256,8 +261,8 @@
                 </div>
               )}
 
-              <div className="pt-4 text-center">
-                <button type="submit" className="w-full py-6 bg-orange-600 hover:bg-orange-700 text-white text-2xl font-black rounded-[2rem] transition-all shadow-xl shadow-orange-600/50 active:scale-95 uppercase tracking-widest text-center">
+              <div className="pt-4">
+                <button type="submit" className="w-full py-6 bg-orange-600 hover:bg-orange-700 text-white text-2xl font-black rounded-[2rem] transition-all shadow-xl shadow-orange-600/50 active:scale-95 uppercase tracking-widest">
                   Enviar Questionário
                 </button>
               </div>
