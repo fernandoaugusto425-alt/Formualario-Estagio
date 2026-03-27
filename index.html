@@ -25,13 +25,15 @@
       0% { transform: scale(0.95); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
-    /* Texto dentro das caixas: Laranja e Negrito */
+    /* Forçar todas as letras a serem pretas e nítidas */
+    input, select, textarea, label, h1, h2, h3, p, span {
+      color: #000000 !important;
+    }
     input::placeholder {
       color: #64748b !important;
       font-weight: 400;
     }
     input {
-      color: #ea580c !important; /* Orange 600 */
       font-weight: 900 !important;
     }
   </style>
@@ -42,6 +44,7 @@
   <script type="text/babel">
     const { useState } = React;
 
+    // Ícones com traço preto
     const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
     const IconBriefcase = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
     const IconBuilding = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>;
@@ -88,36 +91,41 @@
         setFormData({...formData, [listName]: current});
       };
 
+      const handleImageError = (e) => {
+        e.target.src = 'https://via.placeholder.com/150?text=LOGO';
+      };
+
       if (isSubmitted) {
         return (
           <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center animate-pop border-t-8 border-orange-500">
+            <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center animate-pop border-t-8 border-black">
               <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                 <IconCheck />
               </div>
               <h2 className="text-3xl font-black text-black mb-2 uppercase tracking-tighter">Enviado!</h2>
-              <p className="text-slate-700 mb-8 font-bold text-lg italic">Obrigado! O teu questionário foi registado.</p>
-              <button onClick={() => window.location.reload()} className="w-full py-4 bg-black hover:bg-slate-800 text-white font-black rounded-2xl shadow-lg transition-all active:scale-95 uppercase">Voltar ao Início</button>
+              <p className="text-black mb-8 font-black text-lg italic tracking-tight">O teu questionário foi registado com sucesso.</p>
+              <button onClick={() => window.location.reload()} className="w-full py-4 bg-black hover:bg-slate-800 text-white font-black rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest">Sair</button>
             </div>
           </div>
         );
       }
 
       return (
-        <div className="py-6 px-4">
+        <div className="py-4 px-4">
           <div className="max-w-3xl mx-auto">
             
-            <div className="text-center mb-6">
-              <div className="mb-2">
+            {/* CABEÇALHO - LOGO COMPACTA */}
+            <div className="text-center mb-4">
+              <div className="mb-1">
                 <img 
                   src="./logo.png" 
                   alt="Logo Escola" 
                   className="mx-auto w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-2xl transition-transform hover:scale-105 duration-300"
-                  onError={(e) => e.target.src='https://via.placeholder.com/150?text=LOGO'}
+                  onError={handleImageError}
                 />
               </div>
-              <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-xl">Questionário Alunos Técnico</h1>
-              <p className="text-white font-black opacity-100 mt-1 tracking-wide italic text-base sm:text-lg drop-shadow-md">Coronel Castanho de Almeida • 2026</p>
+              <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-xl text-center">Questionário Alunos Técnico</h1>
+              <p className="text-white font-black opacity-100 mt-0.5 tracking-wide italic text-base sm:text-lg drop-shadow-md text-center">Coronel Castanho de Almeida • 2026</p>
             </div>
 
             <form onSubmit={(e) => { e.preventDefault(); setIsSubmitted(true); }} className="glass-effect space-y-8 rounded-[2.5rem] p-6 sm:p-12 shadow-2xl border border-white/20">
@@ -127,30 +135,30 @@
                 <h2 className="text-xl font-black text-black uppercase flex items-center border-b-4 pb-3 border-black">
                   <span className="mr-3 p-2 bg-slate-100 rounded-xl"><IconUser /></span> 1. Identificação
                 </h2>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-4 font-black">
                   <div>
-                    <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">Nome Completo</label>
-                    <input type="text" placeholder="Insira o seu nome" required className="w-full p-4 rounded-2xl border-2 border-black focus:border-orange-500 outline-none bg-white" onChange={e => setFormData({...formData, nome: e.target.value})} />
+                    <label className="text-xs uppercase tracking-widest text-black ml-2 mb-1 block">Nome Completo</label>
+                    <input type="text" placeholder="Escreve o teu nome" required className="w-full p-4 rounded-2xl border-2 border-black focus:border-blue-600 outline-none bg-white" onChange={e => setFormData({...formData, nome: e.target.value})} />
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">E-mail</label>
-                      <input type="email" placeholder="seu@email.com" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, email: e.target.value})} />
+                      <label className="text-xs uppercase tracking-widest text-black ml-2 mb-1 block">E-mail</label>
+                      <input type="email" placeholder="teu@email.com" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, email: e.target.value})} />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">Telefone</label>
+                      <label className="text-xs uppercase tracking-widest text-black ml-2 mb-1 block">Telefone</label>
                       <input type="tel" placeholder="(00) 00000-0000" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, telefone: e.target.value})} />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">CPF</label>
+                      <label className="text-xs uppercase tracking-widest text-black ml-2 mb-1 block">CPF</label>
                       <input type="text" placeholder="000.000.000-00" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, cpf: e.target.value})} />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-black font-black ml-2 mb-1 block">RA</label>
+                      <label className="text-xs uppercase tracking-widest text-black ml-2 mb-1 block">RA</label>
                       <input type="text" placeholder="Registo Académico" required className="p-4 rounded-2xl border-2 border-black outline-none bg-white" onChange={e => setFormData({...formData, ra: e.target.value})} />
                     </div>
                   </div>
@@ -201,26 +209,26 @@
                 </div>
               </div>
 
-              {/* CONTEÚDO CONDICIONAL - BLOQUEADO POR CIEE */}
+              {/* BLOQUEADO PELO CIEE */}
               {formData.interesse === 'SIM' && (
                 <div className="space-y-10 animate-pop pt-2">
                   
                   <div className="bg-slate-50 p-6 rounded-[2rem] border-2 border-black shadow-inner text-center">
-                    <label className="block text-xs font-black text-black mb-3 uppercase tracking-widest">Código de Cadastro CIEE (7 Dígitos) *</label>
+                    <label className="block text-xs font-black text-black mb-3 uppercase tracking-widest">Código CIEE (7 Dígitos Alfanuméricos) *</label>
                     <input 
                       type="text" 
-                      placeholder="Ex: A1B2C3D" 
+                      placeholder="Ex: 1234ABC" 
                       maxLength="7"
                       required 
-                      className="w-full p-4 rounded-xl border-2 border-black outline-none focus:border-orange-500 font-black text-center uppercase" 
+                      className="w-full p-4 rounded-xl border-2 border-black outline-none focus:border-blue-600 font-black text-center uppercase" 
                       onChange={e => setFormData({...formData, codigoCiee: e.target.value})} 
                     />
-                    {!isCieeValid && formData.codigoCiee.length > 0 && (
-                      <p className="text-xs text-red-600 mt-2 font-bold animate-pulse italic">O código deve ter exatamente 7 letras ou números.</p>
+                    {formData.codigoCiee.length > 0 && !isCieeValid && (
+                      <p className="text-xs text-red-600 mt-2 font-black italic">O código deve ter exatamente 7 caracteres.</p>
                     )}
                   </div>
 
-                  {/* LIBERADO APENAS SE CIEE FOR VÁLIDO */}
+                  {/* LIBERADO SE CIEE FOR VÁLIDO */}
                   {isCieeValid ? (
                     <div className="animate-pop space-y-10">
                       <div className="space-y-6">
@@ -229,25 +237,22 @@
                         </h3>
                         
                         {formData.curso === 'AGRO' ? (
-                          <div className="p-8 bg-green-50 border-2 border-black rounded-[2rem] text-black font-black text-center shadow-md">
-                            <p className="text-sm uppercase tracking-widest mb-2">Opção única para Agronegócio:</p>
-                            <div className="p-5 bg-white border-2 border-green-500 rounded-2xl text-2xl text-orange-600">1º PREFEITURA</div>
+                          <div className="p-8 bg-green-50 border-2 border-black rounded-[2rem] text-black font-black text-center shadow-md animate-pop">
+                            <p className="text-sm uppercase tracking-widest mb-2 font-black">Agronegócio:</p>
+                            <div className="p-5 bg-white border-2 border-black rounded-2xl text-2xl">1º PREFEITURA</div>
                           </div>
                         ) : (
-                          <>
-                            <p className="text-xs font-black text-slate-500 mb-2 uppercase">Classifique por ordem de preferência (1º ao 4º):</p>
-                            <div className="grid grid-cols-2 gap-4">
-                              {todasEmpresas.map(emp => {
-                                const rank = formData.empresasRank.indexOf(emp.id);
-                                return (
-                                  <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 4)} className={`relative p-5 border-2 border-black rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${rank !== -1 ? 'bg-orange-600 border-black text-white shadow-xl scale-105' : 'bg-white text-black hover:border-orange-400'}`}>
-                                    {rank !== -1 && <span className="absolute -top-3 -right-3 bg-black text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-black border-2 border-white animate-bounce">{rank + 1}º</span>}
-                                    {emp.label}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </>
+                          <div className="grid grid-cols-2 gap-4">
+                            {todasEmpresas.map(emp => {
+                              const rank = formData.empresasRank.indexOf(emp.id);
+                              return (
+                                <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 4)} className={`relative p-5 border-2 border-black rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${rank !== -1 ? 'bg-black text-white shadow-xl scale-105' : 'bg-white text-black hover:border-slate-300'}`}>
+                                  {rank !== -1 && <span className="absolute -top-3 -right-3 bg-white text-black w-10 h-10 rounded-full flex items-center justify-center text-lg font-black border-2 border-black animate-bounce">{rank + 1}º</span>}
+                                  {emp.label}
+                                </div>
+                              );
+                            })}
+                          </div>
                         )}
                       </div>
 
@@ -287,8 +292,8 @@
                       )}
                     </div>
                   ) : (
-                    <div className="p-8 border-2 border-black border-dashed rounded-[2rem] text-center opacity-50 bg-slate-100">
-                      <p className="font-black text-black uppercase text-xs tracking-widest italic">Aguardando código CIEE válido para liberar escolhas...</p>
+                    <div className="p-8 border-2 border-black border-dashed rounded-[2rem] text-center opacity-70 bg-slate-100">
+                      <p className="font-black text-black uppercase text-xs tracking-widest italic">Insere um código CIEE de 7 dígitos para ver as opções...</p>
                     </div>
                   )}
                 </div>
