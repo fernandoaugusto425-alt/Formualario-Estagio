@@ -60,7 +60,7 @@
     const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
     const IconBriefcase = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
     const IconBuilding = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>;
-    const IconTrash = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>;
+    const IconTrash = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>;
 
     function App() {
       const [view, setView] = useState('form'); 
@@ -172,7 +172,6 @@
           const { collection, getDocs } = window.FirebaseLib;
           const querySnapshot = await getDocs(collection(db, 'respostas_estagio'));
           const data = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-          // Organizar os dados por ordem do mais recente para o mais antigo (opcional, mas ajuda)
           data.sort((a, b) => b.timestamp - a.timestamp);
           setResponses(data);
           setView('dashboard');
@@ -386,7 +385,7 @@
               <div className="space-y-10 animate-pop pt-2">
                 <div className="bg-slate-100 p-6 rounded-[2rem] border-2 border-black shadow-inner text-center font-black">
                   <label className="block text-xs mb-3 uppercase tracking-widest font-black">Código Estudante CIEE (7 Dígitos) *</label>
-                  <input type="text" placeholder="Ex: 1234ABC" maxLength="7" required className="w-full p-4 rounded-xl border-2 border-black outline-none focus:border-blue-500 text-center uppercase" onChange={e => setFormData({...formData, codigoCiee: e.target.value})} />
+                  <input type="text" placeholder="Ex: 1234ABC" maxLength="7" required className="w-full p-4 rounded-xl border-2 border-black outline-none focus:border-blue-500 text-center uppercase" onChange={e => setFormData({...formData, codigoCiee: e.target.value.toUpperCase()})} />
                 </div>
 
                 {isCieeValid ? (
