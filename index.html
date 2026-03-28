@@ -48,9 +48,6 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    // ==============================================================
-    // CHAVES DO SEU FIREBASE 100% CORRETAS
-    // ==============================================================
     const MEU_FIREBASE = {
       apiKey: "AIzaSyCCJ4oxrd9d_C9JeJPvWeUKhmhPeU92gKg",
       authDomain: "formulario-escola-tecnico.firebaseapp.com",
@@ -59,7 +56,6 @@
       messagingSenderId: "212303991437",
       appId: "1:212303991437:web:a17de2c0ac4e9ed1de88c4"
     };
-    // ==============================================================
 
     const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
     const IconBriefcase = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
@@ -176,6 +172,8 @@
           const { collection, getDocs } = window.FirebaseLib;
           const querySnapshot = await getDocs(collection(db, 'respostas_estagio'));
           const data = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+          // Organizar os dados por ordem do mais recente para o mais antigo (opcional, mas ajuda)
+          data.sort((a, b) => b.timestamp - a.timestamp);
           setResponses(data);
           setView('dashboard');
         } catch (err) { setFormError("Erro ao carregar dados: " + err.message); }
@@ -196,9 +194,9 @@
       }), [responses]);
 
       const exportCSV = () => {
-        const headers = "Nome,Email,Telefone,CPF,RA,Ano,Curso,Interesse,CIEE,Ranking_Empresas,Setores_Prefeitura,Setores_Trelo\n";
+        const headers = "Nome,Email,Celular/Telefone,CPF,RA,Ano,Curso,Interesse,CIEE,Ranking_Empresas,Setores_Prefeitura,Setores_Trelo\n";
         const rows = responses.map(r => 
-          `"${r.nome}","${r.email}","${r.telefone}","${r.cpf}","${r.ra}","${r.ano}","${r.curso}","${r.interesse}","${r.codigoCiee}","${r.empresasRank.join(' > ')}","${r.prefeituraRank.join(' | ')}","${r.treloRank.join(' | ')}"`
+          `"${r.nome}","${r.email}","${r.telefone}","${r.cpf}","${r.ra}","${r.ano}","${r.curso}","${r.interesse}","${r.codigoCiee || ''}","${r.empresasRank ? r.empresasRank.join(' > ') : ''}","${r.prefeituraRank ? r.prefeituraRank.join(' | ') : ''}","${r.treloRank ? r.treloRank.join(' | ') : ''}"`
         ).join("\n");
         const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
@@ -219,23 +217,35 @@
                 <tr>
                   <th>Aluno</th>
                   <th>Ano</th>
-                  <th>Contato</th>
-                  <th>Ranking / Setores</th>
+                  <th>Docs & Contato</th>
+                  <th>Estágio & Ranking</th>
                   <th className="text-center">Ação</th>
                 </tr>
               </thead>
               <tbody>
-                {data.map((r, i) => (
+                {data.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="font-black uppercase text-xs">{r.nome}</td>
+                    <td className="font-black uppercase text-xs">
+                      {r.nome}
+                      <div className="text-[9px] text-slate-500 mt-0.5 tracking-widest">RA: {r.ra}</div>
+                    </td>
                     <td className="font-bold">{r.ano}</td>
                     <td className="text-[10px] leading-tight font-bold">
-                        {r.telefone}<br/><span className="opacity-50">{r.email}</span>
+                        <div className="text-slate-800">Celular: {r.telefone}</div>
+                        <div className="opacity-60">{r.email}</div>
+                        <div className="text-blue-700 mt-1">CPF: {r.cpf}</div>
                     </td>
                     <td className="text-[10px] leading-tight font-bold">
-                        <div className="text-blue-800 font-black">EMPRESAS: {r.empresasRank.join(' > ') || 'N/A'}</div>
-                        {r.prefeituraRank.length > 0 && <div className="mt-1">PREF: {r.prefeituraRank.join(' | ')}</div>}
-                        {r.treloRank.length > 0 && <div className="mt-1 text-orange-700">TRELO: {r.treloRank.join(' | ')}</div>}
+                        {r.interesse === 'SIM' ? (
+                          <>
+                            <div className="text-purple-700 mb-1 border-b border-slate-200 pb-1 inline-block">CIEE: {r.codigoCiee}</div>
+                            <div className="text-blue-800 font-black mt-1">EMPRESAS: {r.empresasRank.join(' > ')}</div>
+                            {r.prefeituraRank.length > 0 && <div className="mt-1">PREF: {r.prefeituraRank.join(' | ')}</div>}
+                            {r.treloRank.length > 0 && <div className="mt-1 text-orange-700">TRELO: {r.treloRank.join(' | ')}</div>}
+                          </>
+                        ) : (
+                          <div className="text-red-600 font-black">NÃO TEM INTERESSE</div>
+                        )}
                     </td>
                     <td className="text-center">
                       {deletingId === r.id ? (
@@ -327,7 +337,7 @@
                 <input type="text" placeholder="Nome Completo *" required className="w-full p-4 rounded-2xl border-2 border-black outline-none focus:ring-2 focus:ring-blue-500" onChange={e => setFormData({...formData, nome: e.target.value})} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input type="email" placeholder="E-mail *" required className="p-4 rounded-2xl border-2 border-black outline-none" onChange={e => setFormData({...formData, email: e.target.value})} />
-                  <input type="tel" placeholder="Telefone *" required className="p-4 rounded-2xl border-2 border-black outline-none" onChange={e => setFormData({...formData, telefone: e.target.value})} />
+                  <input type="tel" placeholder="Celular / Telefone *" required className="p-4 rounded-2xl border-2 border-black outline-none" onChange={e => setFormData({...formData, telefone: e.target.value})} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input type="text" placeholder="CPF *" required className="p-4 rounded-2xl border-2 border-black outline-none" onChange={e => setFormData({...formData, cpf: e.target.value})} />
