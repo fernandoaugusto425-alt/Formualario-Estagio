@@ -49,7 +49,7 @@
     const { useState, useEffect, useMemo } = React;
 
     // ==============================================================
-    // CHAVES DO SEU FIREBASE - AGORA 100% CORRETAS!
+    // CHAVES DO SEU FIREBASE 100% CORRETAS
     // ==============================================================
     const MEU_FIREBASE = {
       apiKey: "AIzaSyCCJ4oxrd9d_C9JeJPvWeUKhmhPeU92gKg",
@@ -82,8 +82,6 @@
         ano: '', curso: '', interesse: '', codigoCiee: '',
         empresasRank: [], prefeituraRank: [], treloRank: []
       });
-
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'formulario-tecnico-2026';
 
       useEffect(() => {
         const checkAndInit = async () => {
@@ -151,4 +149,313 @@
         if (error) { setFormError(error); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
         
         if (!db || !user) { 
-          setFormError("A ligação ainda está a ser
+          setFormError("A ligação ainda está a ser feita. Tente novamente em 2 segundos."); 
+          return; 
+        }
+
+        setIsSaving(true);
+        try {
+          const { addDoc, collection, serverTimestamp } = window.FirebaseLib;
+          await addDoc(collection(db, 'respostas_estagio'), {
+            ...formData,
+            userId: user.uid,
+            timestamp: serverTimestamp()
+          });
+          setIsSubmitted(true);
+        } catch (err) {
+          console.error(err);
+          setFormError("Erro ao guardar: " + err.message);
+        } finally { setIsSaving(false); }
+      };
+
+      const fetchAdminData = async () => {
+        if (adminPass !== "PAEETCEL") { setFormError("Senha de Acesso Incorreta"); return; }
+        if (!db || !user) { setFormError("Erro: Sem ligação ao banco de dados."); return; }
+        setFormError("");
+        try {
+          const { collection, getDocs } = window.FirebaseLib;
+          const querySnapshot = await getDocs(collection(db, 'respostas_estagio'));
+          const data = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+          setResponses(data);
+          setView('dashboard');
+        } catch (err) { setFormError("Erro ao carregar dados: " + err.message); }
+      };
+
+      const handleDelete = async (id) => {
+        try {
+          const { deleteDoc, doc } = window.FirebaseLib;
+          await deleteDoc(doc(db, 'respostas_estagio', id));
+          setResponses(responses.filter(r => r.id !== id));
+          setDeletingId(null);
+        } catch (err) { setFormError("Erro ao apagar registo."); }
+      };
+
+      const dataByCourse = useMemo(() => ({
+        adm: responses.filter(r => r.curso === 'ADM'),
+        agro: responses.filter(r => r.curso === 'AGRO')
+      }), [responses]);
+
+      const exportCSV = () => {
+        const headers = "Nome,Email,Telefone,CPF,RA,Ano,Curso,Interesse,CIEE,Ranking_Empresas,Setores_Prefeitura,Setores_Trelo\n";
+        const rows = responses.map(r => 
+          `"${r.nome}","${r.email}","${r.telefone}","${r.cpf}","${r.ra}","${r.ano}","${r.curso}","${r.interesse}","${r.codigoCiee}","${r.empresasRank.join(' > ')}","${r.prefeituraRank.join(' | ')}","${r.treloRank.join(' | ')}"`
+        ).join("\n");
+        const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "relatorio_estagio_2026.csv");
+        link.click();
+      };
+
+      const ReportTable = ({ title, data, borderColor }) => (
+        <div className="space-y-4">
+          <div className={`flex justify-between items-center p-4 bg-white border-l-8 ${borderColor} rounded-r-xl border-2 border-black`}>
+            <h2 className="text-xl font-black uppercase tracking-tight">{title}</h2>
+            <div className="bg-black text-white px-4 py-1 rounded-full font-black text-xs">{data.length} ALUNOS</div>
+          </div>
+          <div className="table-container shadow-lg">
+            <table className="w-full text-left">
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  <th>Ano</th>
+                  <th>Contato</th>
+                  <th>Ranking / Setores</th>
+                  <th className="text-center">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((r, i) => (
+                  <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="font-black uppercase text-xs">{r.nome}</td>
+                    <td className="font-bold">{r.ano}</td>
+                    <td className="text-[10px] leading-tight font-bold">
+                        {r.telefone}<br/><span className="opacity-50">{r.email}</span>
+                    </td>
+                    <td className="text-[10px] leading-tight font-bold">
+                        <div className="text-blue-800 font-black">EMPRESAS: {r.empresasRank.join(' > ') || 'N/A'}</div>
+                        {r.prefeituraRank.length > 0 && <div className="mt-1">PREF: {r.prefeituraRank.join(' | ')}</div>}
+                        {r.treloRank.length > 0 && <div className="mt-1 text-orange-700">TRELO: {r.treloRank.join(' | ')}</div>}
+                    </td>
+                    <td className="text-center">
+                      {deletingId === r.id ? (
+                        <div className="flex gap-1 justify-center animate-pop">
+                          <button onClick={() => handleDelete(r.id)} className="bg-red-600 text-white p-1 rounded font-black text-[8px] uppercase">Apagar</button>
+                          <button onClick={() => setDeletingId(null)} className="bg-slate-300 p-1 rounded text-[8px] font-black uppercase">Não</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => setDeletingId(r.id)} className="text-red-500 hover:text-red-700 p-2 transition-transform hover:scale-125">
+                          <IconTrash />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {data.length === 0 && <div className="p-10 text-center font-black opacity-30 italic">Sem registos encontrados.</div>}
+          </div>
+        </div>
+      );
+
+      if (view === 'dashboard') {
+        return (
+          <div className="min-h-screen bg-slate-50 p-4 sm:p-10">
+            <div className="max-w-6xl mx-auto space-y-8 animate-pop">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-6 border-b-4 border-black pb-6">
+                <div>
+                  <h1 className="text-3xl font-black uppercase tracking-tighter">Relatórios 2026</h1>
+                  <p className="font-bold opacity-60 uppercase text-[10px] tracking-widest">Painel Administrativo • Escola Castanho de Almeida</p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={exportCSV} className="bg-green-600 text-white px-6 py-3 rounded-xl font-black shadow-lg active:scale-95 transition-all">EXPORTAR EXCEL</button>
+                  <button onClick={() => setView('form')} className="bg-black text-white px-6 py-3 rounded-xl font-black active:scale-95 transition-all">VOLTAR</button>
+                </div>
+              </div>
+              <ReportTable title="Curso: Administração" data={dataByCourse.adm} borderColor="border-blue-600" />
+              <ReportTable title="Curso: Agronegócio" data={dataByCourse.agro} borderColor="border-orange-600" />
+            </div>
+          </div>
+        );
+      }
+
+      if (view === 'admin_login') {
+        return (
+          <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm border-4 border-black text-center animate-pop">
+              <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter italic">Acesso Administrador</h2>
+              <input type="password" placeholder="SENHA DE ACESSO" className="w-full p-4 border-2 border-black rounded-xl mb-4 text-center font-black uppercase placeholder:normal-case" onChange={e => setAdminPass(e.target.value)} />
+              {formError && <p className="text-red-600 font-black text-xs mb-4">{formError}</p>}
+              <button onClick={fetchAdminData} className="w-full py-4 bg-black text-white rounded-xl font-black hover:bg-slate-900 transition-all uppercase tracking-widest">Entrar</button>
+              <button onClick={() => setView('form')} className="mt-4 text-[10px] font-black uppercase underline decoration-2">Cancelar e voltar</button>
+            </div>
+          </div>
+        );
+      }
+
+      if (isSubmitted) {
+        return (
+          <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center animate-pop border-t-8 border-black border-2">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="green" strokeWidth="4"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+              <h2 className="text-3xl font-black mb-2 uppercase tracking-tighter italic text-center">Enviado!</h2>
+              <p className="mb-8 font-black text-lg italic tracking-tight opacity-70">Obrigado! O teu questionário foi registado com sucesso.</p>
+              <button onClick={() => window.location.reload()} className="w-full py-4 bg-black text-white font-black rounded-2xl shadow-lg uppercase transition-all active:scale-95">Nova Resposta</button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="py-4 px-4 max-w-3xl mx-auto">
+          <div className="text-center mb-4">
+            <img src="./logo.png" alt="Logo" className="mx-auto w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-2xl mb-1" onError={(e) => e.target.src='https://via.placeholder.com/150?text=LOGO'} />
+            <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-xl leading-none text-center">Questionário Alunos Técnico</h1>
+            <p className="text-white font-black opacity-100 mt-1 italic text-base sm:text-lg text-center">Escola Castanho de Almeida • 2026</p>
+          </div>
+
+          {formError && <div className="bg-red-600 text-white p-4 rounded-2xl mb-6 font-black text-center shadow-xl border-4 border-white animate-pop">⚠️ {formError}</div>}
+
+          <form onSubmit={handleSubmit} className="glass-effect space-y-8 rounded-[2.5rem] p-6 sm:p-12 shadow-2xl border border-white/20">
+            <div className="space-y-6">
+              <h2 className="text-xl font-black uppercase flex items-center border-b-4 pb-3 border-black">
+                <span className="mr-3 p-2 bg-slate-100 rounded-xl"><IconUser /></span> 1. Identificação
+              </h2>
+              <div className="grid grid-cols-1 gap-4 font-black">
+                <input type="text" placeholder="Nome Completo *" required className="w-full p-4 rounded-2xl border-2 border-black outline-none focus:ring-2 focus:ring-blue-500" onChange={e => setFormData({...formData, nome: e.target.value})} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input type="email" placeholder="E-mail *" required className="p-4 rounded-2xl border-2 border-black outline-none" onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <input type="tel" placeholder="Telefone *" required className="p-4 rounded-2xl border-2 border-black outline-none" onChange={e => setFormData({...formData, telefone: e.target.value})} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input type="text" placeholder="CPF *" required className="p-4 rounded-2xl border-2 border-black outline-none" onChange={e => setFormData({...formData, cpf: e.target.value})} />
+                  <input type="text" placeholder="RA *" required className="p-4 rounded-2xl border-2 border-black outline-none" onChange={e => setFormData({...formData, ra: e.target.value})} />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="font-black text-xs uppercase tracking-widest text-center underline decoration-black decoration-2 underline-offset-4">Ano e Curso Técnico *</h3>
+              <div className="grid grid-cols-2 gap-3 text-center">
+                {['2º Ano', '3º Ano'].map(a => (
+                  <label key={a} className={`p-4 border-2 border-black rounded-2xl cursor-pointer font-black transition-all ${formData.ano === a ? 'bg-black text-white shadow-lg' : 'bg-white text-black hover:bg-slate-100'}`}>
+                    <input type="radio" name="ano" className="sr-only" required onChange={() => setFormData({...formData, ano: a})} /> {a}
+                  </label>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label className={`flex flex-col items-center p-6 border-2 border-black rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'ADM' ? 'bg-blue-700 border-blue-700 text-white shadow-xl scale-105' : 'bg-white text-black opacity-80'}`}>
+                  <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'ADM', empresasRank: [], prefeituraRank: [], treloRank: []})} />
+                  <img src="./logo_adm.png" alt="ADM" className="mb-4 w-16 h-16 object-contain" onError={(e) => e.target.src='https://via.placeholder.com/80?text=ADM'} />
+                  <span className="font-black uppercase tracking-widest">Administração</span>
+                </label>
+                <label className={`flex flex-col items-center p-6 border-2 border-black rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'AGRO' ? 'bg-orange-600 border-orange-600 text-white shadow-xl scale-105' : 'bg-white text-black opacity-80'}`}>
+                  <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'AGRO', empresasRank: ['prefeitura'], prefeituraRank: [], treloRank: []})} />
+                  <img src="./logo_agro.png" alt="AGRO" className="mb-4 w-16 h-16 object-contain" onError={(e) => e.target.src='https://via.placeholder.com/80?text=AGRO'} />
+                  <span className="font-black uppercase tracking-widest">Agronegócio</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <h2 className="text-xl font-black uppercase flex items-center border-b-4 pb-3 border-black">
+                <span className="mr-3 p-2 bg-slate-100 rounded-xl"><IconBriefcase /></span> 2. Estágio *
+              </h2>
+              <div className="flex gap-3 text-center font-black">
+                {['SIM', 'NÃO'].map(opt => (
+                  <label key={opt} className={`flex-1 p-4 border-2 border-black rounded-2xl cursor-pointer transition-all ${formData.interesse === opt ? 'bg-black text-white shadow-lg' : 'bg-white text-black'}`}>
+                    <input type="radio" name="interesse" className="sr-only" required onChange={() => setFormData({...formData, interesse: opt})} /> {opt === 'SIM' ? 'QUERO ESTAGIAR' : 'NÃO AGORA'}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {formData.interesse === 'SIM' && (
+              <div className="space-y-10 animate-pop pt-2">
+                <div className="bg-slate-100 p-6 rounded-[2rem] border-2 border-black shadow-inner text-center font-black">
+                  <label className="block text-xs mb-3 uppercase tracking-widest font-black">Código Estudante CIEE (7 Dígitos) *</label>
+                  <input type="text" placeholder="Ex: 1234ABC" maxLength="7" required className="w-full p-4 rounded-xl border-2 border-black outline-none focus:border-blue-500 text-center uppercase" onChange={e => setFormData({...formData, codigoCiee: e.target.value})} />
+                </div>
+
+                {isCieeValid ? (
+                  <div className="animate-pop space-y-10">
+                    <div className="space-y-6">
+                      <h3 className="font-black uppercase flex items-center tracking-tight text-xl"><span className="mr-2 p-2 bg-slate-100 rounded-lg"><IconBuilding /></span> 3. Prioridade de Empresa *</h3>
+                      {formData.curso === 'AGRO' ? (
+                        <div className="p-8 bg-green-50 border-2 border-black rounded-[2rem] text-black font-black text-center shadow-md animate-pop">
+                          <div className="p-5 bg-white border-2 border-black rounded-2xl text-2xl uppercase">1º PREFEITURA</div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-4">
+                          {todasEmpresas.map(emp => {
+                            const rank = formData.empresasRank.indexOf(emp.id);
+                            return (
+                              <div key={emp.id} onClick={() => handleRanking('empresasRank', emp.id, 4)} className={`relative p-5 border-2 border-black rounded-2xl cursor-pointer text-center font-black text-lg transition-all ${rank !== -1 ? 'bg-black text-white shadow-xl' : 'bg-white text-black hover:bg-slate-100'}`}>
+                                {rank !== -1 && <span className="rank-badge">{rank + 1}º</span>}
+                                {emp.label}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {formData.curso === 'ADM' && formData.empresasRank.includes('prefeitura') && (
+                      <div className="p-8 bg-slate-100 rounded-[2rem] border-2 border-black space-y-6 shadow-inner animate-pop font-black">
+                        <p className="uppercase text-[10px] text-center underline decoration-black decoration-2">Setores Prefeitura (Ordene TODOS) *</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                          {areasPrefeitura.map(a => {
+                            const rank = formData.prefeituraRank.indexOf(a);
+                            return (
+                              <div key={a} onClick={() => handleRanking('prefeituraRank', a, areasPrefeitura.length)} className={`relative p-3 border-2 border-black rounded-xl cursor-pointer text-center text-[10px] ${rank !== -1 ? 'bg-blue-700 text-white shadow-xl' : 'bg-white text-black hover:border-slate-300'}`}>
+                                {rank !== -1 && <span className="rank-badge">{rank + 1}º</span>}
+                                {a}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {formData.curso === 'ADM' && formData.empresasRank.includes('trelo') && (
+                      <div className="p-8 bg-slate-100 rounded-[2rem] border-2 border-black space-y-6 shadow-inner animate-pop font-black">
+                        <p className="uppercase text-[10px] text-center underline decoration-black decoration-2">Setores Trelo (Ordene TODOS) *</p>
+                        <div className="grid grid-cols-2 gap-4">
+                          {areasTrelo.map(a => {
+                            const rank = formData.treloRank.indexOf(a);
+                            return (
+                              <div key={a} onClick={() => handleRanking('treloRank', a, areasTrelo.length)} className={`relative p-3 border-2 border-black rounded-xl cursor-pointer text-center text-[10px] ${rank !== -1 ? 'bg-blue-700 text-white shadow-xl' : 'bg-white text-black hover:border-slate-300'}`}>
+                                {rank !== -1 && <span className="rank-badge">{rank + 1}º</span>}
+                                {a}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-8 border-2 border-black border-dashed rounded-[2rem] text-center opacity-70 bg-white italic font-black uppercase text-[10px]">Insira o CIEE (7 caracteres) para liberar as opções...</div>
+                )}
+              </div>
+            )}
+
+            <button type="submit" disabled={isSaving} className="w-full py-6 bg-orange-600 hover:bg-orange-700 text-white text-2xl font-black rounded-[2rem] shadow-xl uppercase transition-all flex items-center justify-center active:scale-95 border-2 border-black">
+              {isSaving ? <span className="loading-spinner"></span> : "ENVIAR MINHA RESPOSTA"}
+            </button>
+          </form>
+          
+          <p onClick={() => setView('admin_login')} className="text-center text-white/50 font-black text-[10px] mt-8 tracking-widest uppercase cursor-pointer hover:text-white transition-colors select-none">
+            &copy; 2026 Escola Coronel Castanho de Almeida
+          </p>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
