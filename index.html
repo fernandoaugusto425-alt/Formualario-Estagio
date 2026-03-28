@@ -48,9 +48,6 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    // ==============================================================
-    // CHAVES DO SEU FIREBASE (Formulario Escola-tecnico)
-    // ==============================================================
     const MEU_FIREBASE = {
       apiKey: "AIzaSyCCJ4oxrd9d_C9JeJPvWeUKhxhPeW92gkg",
       authDomain: "formulario-escola-tecnico.firebaseapp.com",
@@ -59,7 +56,6 @@
       messagingSenderId: "212303991437",
       appId: "1:212303991437:web:a17de2c0ac4e9ed1de88c4"
     };
-    // ==============================================================
 
     const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
     const IconBriefcase = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
@@ -83,6 +79,8 @@
         empresasRank: [], prefeituraRank: [], treloRank: []
       });
 
+      const appId = typeof __app_id !== 'undefined' ? __app_id : 'formulario-tecnico-2026';
+
       useEffect(() => {
         const checkAndInit = async () => {
           if (!window.FirebaseLib) {
@@ -101,7 +99,8 @@
             onAuthStateChanged(auth, setUser);
           } catch (err) { 
             console.error(err); 
-            setFormError("Falha ao ligar ao Banco de Dados.");
+            // AGORA MOSTRA O ERRO EXATO DO FIREBASE NA TELA
+            setFormError("Erro de ligação Firebase: " + err.message);
           }
         };
         checkAndInit();
@@ -149,7 +148,7 @@
         if (error) { setFormError(error); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
         
         if (!db || !user) { 
-          setFormError("Erro: Conexão com o servidor pendente. Aguarde uns segundos."); 
+          setFormError("A ligação ainda está a ser feita. Tente novamente em 2 segundos."); 
           return; 
         }
 
@@ -164,7 +163,7 @@
           setIsSubmitted(true);
         } catch (err) {
           console.error(err);
-          setFormError("Erro ao guardar os dados.");
+          setFormError("Erro ao guardar: " + err.message);
         } finally { setIsSaving(false); }
       };
 
@@ -178,7 +177,7 @@
           const data = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
           setResponses(data);
           setView('dashboard');
-        } catch (err) { setFormError("Erro ao carregar dados."); }
+        } catch (err) { setFormError("Erro ao carregar dados: " + err.message); }
       };
 
       const handleDelete = async (id) => {
