@@ -108,7 +108,6 @@
         { id: 'tonho', label: 'Tonho Móveis' }, { id: 'sicoob', label: 'Sicoob' }
       ];
       
-      // Filtra as empresas consoante o curso escolhido
       const empresasParaOCurso = formData.curso === 'AGRO' 
         ? todasEmpresas.filter(emp => emp.id === 'prefeitura' || emp.id === 'sicoob')
         : todasEmpresas;
@@ -201,11 +200,15 @@
       }), [responses]);
 
       const exportCSV = () => {
-        const headers = "Nome,Email,Celular/Telefone,CPF,RA,Ano,Curso,Interesse,CIEE,Ranking_Empresas,Setores_Prefeitura,Setores_Trelo\n";
+        // TROCADO PARA PONTO E VÍRGULA (;) PARA O EXCEL ABRIR DIREITINHO NAS COLUNAS
+        const headers = "Nome;Email;Celular/Telefone;CPF;RA;Ano;Curso;Interesse;CIEE;Ranking_Empresas;Setores_Prefeitura;Setores_Trelo\n";
+        
         const rows = responses.map(r => 
-          `"${r.nome}","${r.email}","${r.telefone}","${r.cpf}","${r.ra}","${r.ano}","${r.curso}","${r.interesse}","${r.codigoCiee ? r.codigoCiee.toUpperCase() : ''}","${r.empresasRank ? r.empresasRank.join(' > ') : ''}","${r.prefeituraRank ? r.prefeituraRank.join(' | ') : ''}","${r.treloRank ? r.treloRank.join(' | ') : ''}"`
+          `"${r.nome}";"${r.email}";"${r.telefone}";"${r.cpf}";"${r.ra}";"${r.ano}";"${r.curso}";"${r.interesse}";"${r.codigoCiee ? r.codigoCiee.toUpperCase() : ''}";"${r.empresasRank ? r.empresasRank.join(' > ') : ''}";"${r.prefeituraRank ? r.prefeituraRank.join(' | ') : ''}";"${r.treloRank ? r.treloRank.join(' | ') : ''}"`
         ).join("\n");
-        const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
+        
+        // ADICIONADO "\uFEFF" PARA FORÇAR O EXCEL A LER OS ACENTOS CORRETAMENTE (UTF-8 BOM)
+        const blob = new Blob(["\uFEFF" + headers + rows], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.setAttribute("download", "relatorio_estagio_2026.csv");
@@ -245,7 +248,6 @@
                     <td className="text-[10px] leading-tight font-bold">
                         {r.interesse === 'SIM' ? (
                           <>
-                            {/* O CIEE AGORA MOSTRA SEMPRE EM MAIÚSCULO NO RELATÓRIO */}
                             <div className="text-purple-700 mb-1 border-b border-slate-200 pb-1 inline-block">CIEE: {r.codigoCiee ? r.codigoCiee.toUpperCase() : ''}</div>
                             <div className="text-blue-800 font-black mt-1">EMPRESAS: {r.empresasRank.join(' > ')}</div>
                             {r.prefeituraRank && r.prefeituraRank.length > 0 && <div className="mt-1">PREF: {r.prefeituraRank.join(' | ')}</div>}
@@ -402,7 +404,6 @@
                     <div className="space-y-6">
                       <h3 className="font-black uppercase flex items-center tracking-tight text-xl"><span className="mr-2 p-2 bg-slate-100 rounded-lg"><IconBuilding /></span> 3. Prioridade de Empresa *</h3>
                       
-                      {/* CAIXA DE OPÇÕES E RANKING PARA AS EMPRESAS - AGORA ADAPTÁVEL */}
                       <div className="grid grid-cols-2 gap-4">
                         {empresasParaOCurso.map(emp => {
                           const rank = formData.empresasRank.indexOf(emp.id);
