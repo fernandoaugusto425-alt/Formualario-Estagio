@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interesse: Visitas Técnicas 2026</title>
+  <title>Questionário Alunos Técnico</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -12,49 +12,41 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    window.FirebaseLib = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp };
+    window.FirebaseLib = { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query };
   </script>
   
   <style>
-    /* FUNDOS VOLTARAM PARA .JPG */
-    .bg-split-left {
-      position: fixed; top: 0; left: 0; width: 100%; height: 50%; z-index: -1;
-      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./bg_tranbrasa.jpg') center/cover no-repeat;
-      background-color: #064e3b; 
-    }
-    .bg-split-right {
-      position: fixed; bottom: 0; left: 0; width: 100%; height: 50%; z-index: -1;
-      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./bg_usina.jpg') center/cover no-repeat;
-      background-color: #059669; 
-    }
+    .glass-effect { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); }
+    .school-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #f97316 100%); }
+    .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    @keyframes pop { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     
-    @media (min-width: 640px) {
-      .bg-split-left { width: 50%; height: 100%; }
-      .bg-split-right { top: 0; left: 50%; width: 50%; height: 100%; }
-    }
+    * { color: #000000; }
+    input, select, textarea, label, h1, h2, h3, p, span, td, th { color: #000000 !important; }
+    input { font-weight: 900 !important; }
+    
+    .loading-spinner { border: 3px solid rgba(0,0,0,0.1); border-radius: 50%; border-top: 3px solid #000; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    .table-container { overflow-x: auto; background: white; border-radius: 1rem; border: 2px solid #000; }
+    th { background: #f1f5f9; border-bottom: 2px solid #000; padding: 12px; font-weight: 900; text-transform: uppercase; font-size: 0.7rem; }
+    td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 0.8rem; }
 
-    .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-    .animate-in { animation: fadeIn 0.5s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    * { color: #1f2937; }
-    input { font-weight: 700 !important; }
-    .course-logo { width: 80px; height: 80px; object-contain; margin-bottom: 12px; }
-    .company-logo { width: 48px; height: 48px; object-contain; background: white; border-radius: 12px; padding: 4px; border: 1px solid #e5e7eb; display: none; /* Escondido por enquanto se não tiver a imagem */ }
-    /* Faz o logo aparecer só se a imagem carregar com sucesso (truque de css inline abaixo) */
+    .rank-badge {
+      position: absolute; top: -10px; right: -10px; background-color: #000; color: #fff !important;
+      width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 900; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10;
+    }
   </style>
 </head>
-<body class="min-h-screen antialiased p-4 sm:p-8 relative">
-  
-  <div class="bg-split-left"></div>
-  <div class="bg-split-right"></div>
-
+<body class="antialiased font-sans school-bg min-h-screen">
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useMemo } = React;
 
     const MEU_FIREBASE = {
       apiKey: "AIzaSyCCJ4oxrd9d_C9JeJPvWeUKhmhPeU92gKg",
@@ -65,64 +57,5 @@
       appId: "1:212303991437:web:a17de2c0ac4e9ed1de88c4"
     };
 
-    function App() {
-      const [view, setView] = useState('form');
-      const [status, setStatus] = useState({ loading: false, error: '', submitted: false });
-      const [db, setDb] = useState(null);
-      const [user, setUser] = useState(null);
-      const [responses, setResponses] = useState([]);
-      const [adminPass, setAdminPass] = useState("");
-
-      const [formData, setFormData] = useState({
-        nome: '',
-        curso: '',
-        interesseTranbrasa: '',
-        interesseUsina: ''
-      });
-
-      useEffect(() => {
-        const init = async () => {
-          if (!window.FirebaseLib) { setTimeout(init, 500); return; }
-          const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore } = window.FirebaseLib;
-          try {
-            const app = initializeApp(MEU_FIREBASE);
-            const auth = getAuth(app);
-            const firestore = getFirestore(app);
-            setDb(firestore);
-            await signInAnonymously(auth);
-            onAuthStateChanged(auth, setUser);
-          } catch (e) { setStatus(s => ({...s, error: 'Erro de conexão.'})); }
-        };
-        init();
-      }, []);
-
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!formData.curso || !formData.interesseTranbrasa || !formData.interesseUsina) {
-          setStatus(s => ({...s, error: 'Preencha todos os campos obrigatórios.'}));
-          return;
-        }
-        setStatus(s => ({...s, loading: true, error: ''}));
-        try {
-          const { addDoc, collection, serverTimestamp } = window.FirebaseLib;
-          await addDoc(collection(db, 'visitas_tecnicas'), {
-            ...formData,
-            timestamp: serverTimestamp()
-          });
-          setStatus(s => ({...s, loading: false, submitted: true}));
-        } catch (e) { setStatus(s => ({...s, loading: false, error: 'Erro ao enviar.'})); }
-      };
-
-      const loginAdmin = async () => {
-        if (adminPass !== "PAEETCEL") { setStatus(s => ({...s, error: 'Senha incorreta'})); return; }
-        try {
-          const { collection, getDocs } = window.FirebaseLib;
-          const snap = await getDocs(collection(db, 'visitas_tecnicas'));
-          setResponses(snap.docs.map(d => ({...d.data(), id: d.id})));
-          setView('admin');
-          setStatus(s => ({...s, error: ''}));
-        } catch (e) { setStatus(s => ({...s, error: 'Erro ao carregar dados'})); }
-      };
-
-      if (status.submitted) return (
-        <div className="max-w-md mx-auto glass rounded-3xl p-10 text-center animate-
+    const IconUser = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+    const IconBriefcase = () => <svg width="
