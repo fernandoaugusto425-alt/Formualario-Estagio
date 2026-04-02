@@ -19,7 +19,23 @@
   </script>
   
   <style>
-    .visit-bg { background: linear-gradient(135deg, #064e3b 0%, #059669 100%); }
+    /* DIVISÃO DO FUNDO CORRIGIDA PARA .PNG */
+    .bg-split-left {
+      position: fixed; top: 0; left: 0; width: 100%; height: 50%; z-index: -1;
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./bg_tranbrasa.png') center/cover no-repeat;
+      background-color: #064e3b; 
+    }
+    .bg-split-right {
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 50%; z-index: -1;
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./bg_usina.png') center/cover no-repeat;
+      background-color: #059669; 
+    }
+    
+    @media (min-width: 640px) {
+      .bg-split-left { width: 50%; height: 100%; }
+      .bg-split-right { top: 0; left: 50%; width: 50%; height: 100%; }
+    }
+
     .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
     .animate-in { animation: fadeIn 0.5s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -29,7 +45,11 @@
     .company-logo { width: 48px; height: 48px; object-contain; background: white; border-radius: 12px; padding: 4px; border: 1px solid #e5e7eb; }
   </style>
 </head>
-<body class="visit-bg min-h-screen antialiased p-4 sm:p-8">
+<body class="min-h-screen antialiased p-4 sm:p-8 relative">
+  
+  <div class="bg-split-left"></div>
+  <div class="bg-split-right"></div>
+
   <div id="root"></div>
 
   <script type="text/babel">
@@ -104,15 +124,15 @@
       };
 
       if (status.submitted) return (
-        <div className="max-w-md mx-auto glass rounded-3xl p-10 text-center animate-in shadow-2xl mt-20">
+        <div className="max-w-md mx-auto glass rounded-3xl p-10 text-center animate-in shadow-2xl mt-20 border border-white/50">
           <h2 className="text-3xl font-black mb-4">Registado! ✅</h2>
           <p className="font-bold opacity-70 mb-8">Obrigado por demonstrares o teu interesse nas visitas técnicas.</p>
-          <button onClick={() => window.location.reload()} className="w-full py-4 bg-emerald-600 text-white font-black rounded-xl uppercase">Nova Resposta</button>
+          <button onClick={() => window.location.reload()} className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl uppercase transition-all">Nova Resposta</button>
         </div>
       );
 
       if (view === 'admin') return (
-        <div className="max-w-5xl mx-auto glass rounded-3xl p-6 shadow-2xl animate-in">
+        <div className="max-w-5xl mx-auto glass rounded-3xl p-6 shadow-2xl animate-in border border-white/50">
           <div className="flex justify-between items-center mb-8 border-b-2 border-emerald-100 pb-4">
             <h2 className="text-2xl font-black uppercase tracking-tighter">Relatório de Visitas</h2>
             <button onClick={() => setView('form')} className="bg-black text-white px-6 py-2 rounded-lg font-bold text-xs">VOLTAR</button>
@@ -138,15 +158,16 @@
                 ))}
               </tbody>
             </table>
+            {responses.length === 0 && <div className="p-10 text-center font-black opacity-30 italic">Nenhum interesse registado ainda.</div>}
           </div>
         </div>
       );
 
       return (
-        <div className="max-w-xl mx-auto space-y-6">
-          <div className="text-center text-white mb-8">
-            <h1 className="text-4xl font-black uppercase tracking-tighter leading-none">Visitas Técnicas 2026</h1>
-            <p className="font-bold opacity-80 mt-2">Levantamento de Interesse dos Alunos</p>
+        <div className="max-w-xl mx-auto space-y-6 relative z-10">
+          <div className="text-center text-white mb-8 drop-shadow-lg">
+            <h1 className="text-4xl font-black uppercase tracking-tighter leading-none text-white">Visitas Técnicas 2026</h1>
+            <p className="font-bold text-white opacity-90 mt-2">Levantamento de Interesse dos Alunos</p>
           </div>
 
           <form onSubmit={handleSubmit} className="glass rounded-[2.5rem] p-8 sm:p-12 shadow-2xl animate-in space-y-10 border border-white/50">
@@ -154,7 +175,7 @@
               <label className="text-[10px] font-black uppercase tracking-widest opacity-50 block ml-2">Identificação</label>
               <input 
                 type="text" placeholder="Nome Completo *" required 
-                className="w-full p-4 rounded-2xl border-2 border-emerald-100 outline-none focus:border-emerald-500 transition-all uppercase shadow-inner"
+                className="w-full p-4 rounded-2xl border-2 border-emerald-100 outline-none focus:border-emerald-500 transition-all uppercase shadow-inner bg-white/80 focus:bg-white"
                 onChange={e => setFormData({...formData, nome: e.target.value})}
               />
               
@@ -168,7 +189,6 @@
                     className={`p-6 flex flex-col items-center justify-center rounded-3xl border-2 transition-all active:scale-95 ${formData.curso === c.id ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg scale-105' : 'bg-white border-emerald-100 hover:bg-emerald-50 hover:border-emerald-200'}`}
                     onClick={() => setFormData({...formData, curso: c.id})}
                   >
-                    {/* LOGO DO CURSO */}
                     <img 
                       src={c.img} alt={c.label} 
                       className="course-logo" 
@@ -182,9 +202,8 @@
 
             <div className="space-y-8">
               {/* VISITA 1: TRANBRASA */}
-              <div className="p-6 bg-emerald-50 rounded-3xl space-y-5 shadow-inner border border-emerald-100">
+              <div className="p-6 bg-emerald-50/80 rounded-3xl space-y-5 shadow-inner border border-emerald-100">
                 <div className="flex items-center gap-3">
-                  {/* LOGO DA EMPRESA 1 */}
                   <img 
                     src="./logo_tranbrasa.png" alt="Tranbrasa Santos" 
                     className="company-logo"
@@ -204,58 +223,9 @@
               </div>
 
               {/* VISITA 2: USINA */}
-              <div className="p-6 bg-emerald-50 rounded-3xl space-y-5 shadow-inner border border-emerald-100">
+              <div className="p-6 bg-emerald-50/80 rounded-3xl space-y-5 shadow-inner border border-emerald-100">
                 <div className="flex items-center gap-3">
-                  {/* LOGO DA EMPRESA 2 */}
                   <img 
                     src="./logo_usina.png" alt="Usina Vista Alegre" 
                     className="company-logo"
-                    onError={(e) => e.target.src='https://via.placeholder.com/48?text=Usina'}
-                  />
-                  <h3 className="font-black text-sm uppercase tracking-tight text-emerald-950 flex-1">2. Usina Vista Alegre (Itapetininga)</h3>
-                </div>
-                <div className="flex gap-3">
-                  {['SIM', 'NÃO'].map(opt => (
-                    <button 
-                      type="button" key={opt}
-                      className={`flex-1 p-4 rounded-xl border-2 font-black text-xs uppercase tracking-widest transition-all ${formData.interesseUsina === opt ? 'bg-black border-black text-white shadow-lg' : 'bg-white border-emerald-200 hover:border-emerald-300'}`}
-                      onClick={() => setFormData({...formData, interesseUsina: opt})}
-                    >{opt}</button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {status.error && <p className="text-red-500 font-bold text-center text-xs bg-red-50 p-3 rounded-lg border border-red-200 animate-pop">{status.error}</p>}
-
-            <button 
-              type="submit" disabled={status.loading}
-              className="w-full py-6 bg-emerald-600 hover:bg-emerald-700 text-white text-2xl font-black rounded-3xl shadow-xl uppercase transition-all flex items-center justify-center active:scale-95 disabled:opacity-50"
-            >
-              {status.loading ? <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></span> : null}
-              {status.loading ? 'A registar...' : 'Registar Interesse'}
-            </button>
-          </form>
-
-          <div className="text-center pt-8">
-            <button onClick={() => setView('login')} className="text-white/40 font-black text-[10px] uppercase tracking-widest hover:text-white transition-colors">Acesso Administrativo</button>
-            {view === 'login' && (
-              <div className="mt-4 p-5 glass rounded-2xl animate-in max-w-xs mx-auto border border-white/50 shadow-xl">
-                <input 
-                  type="password" placeholder="Senha" 
-                  className="w-full p-3 rounded-xl border border-emerald-200 mb-3 text-center text-xs shadow-inner"
-                  onChange={e => setAdminPass(e.target.value)}
-                />
-                <button onClick={loginAdmin} className="w-full py-3 bg-black text-white rounded-xl font-bold text-[10px] uppercase tracking-widest active:scale-95">Entrar</button>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
-</body>
-</html>
+                    onError={(e) =>
