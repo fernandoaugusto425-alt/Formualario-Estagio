@@ -19,15 +19,15 @@
   </script>
   
   <style>
-    /* DIVISÃO DO FUNDO CORRIGIDA PARA .PNG */
+    /* FUNDOS VOLTARAM PARA .JPG */
     .bg-split-left {
       position: fixed; top: 0; left: 0; width: 100%; height: 50%; z-index: -1;
-      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./bg_tranbrasa.png') center/cover no-repeat;
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./bg_tranbrasa.jpg') center/cover no-repeat;
       background-color: #064e3b; 
     }
     .bg-split-right {
       position: fixed; bottom: 0; left: 0; width: 100%; height: 50%; z-index: -1;
-      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./bg_usina.png') center/cover no-repeat;
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./bg_usina.jpg') center/cover no-repeat;
       background-color: #059669; 
     }
     
@@ -42,7 +42,7 @@
     * { color: #1f2937; }
     input { font-weight: 700 !important; }
     .course-logo { width: 80px; height: 80px; object-contain; margin-bottom: 12px; }
-    .company-logo { width: 48px; height: 48px; object-contain; background: white; border-radius: 12px; padding: 4px; border: 1px solid #e5e7eb; }
+    .company-logo { width: 48px; height: 48px; object-contain; background: white; border-radius: 12px; padding: 4px; border: 1px solid #e5e7eb; display: none; }
   </style>
 </head>
 <body class="min-h-screen antialiased p-4 sm:p-8 relative">
@@ -192,7 +192,7 @@
                     <img 
                       src={c.img} alt={c.label} 
                       className="course-logo" 
-                      onError={(e) => e.target.src=`https://via.placeholder.com/80?text=${c.id}`}
+                      onError={(e) => { e.target.style.display = 'none'; }}
                     />
                     <span className={`font-black text-sm uppercase tracking-tight ${formData.curso === c.id ? 'text-white' : 'text-emerald-900'}`}>Curso {c.id}</span>
                   </button>
@@ -207,7 +207,8 @@
                   <img 
                     src="./logo_tranbrasa.png" alt="Tranbrasa Santos" 
                     className="company-logo"
-                    onError={(e) => e.target.src='https://via.placeholder.com/48?text=Santos'}
+                    onLoad={(e) => { e.target.style.display = 'block'; }}
+                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
                   <h3 className="font-black text-sm uppercase tracking-tight text-emerald-950 flex-1">1. Visita Tranbrasa (Santos)</h3>
                 </div>
@@ -228,4 +229,53 @@
                   <img 
                     src="./logo_usina.png" alt="Usina Vista Alegre" 
                     className="company-logo"
-                    onError={(e) =>
+                    onLoad={(e) => { e.target.style.display = 'block'; }}
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                  <h3 className="font-black text-sm uppercase tracking-tight text-emerald-950 flex-1">2. Usina Vista Alegre (Itapetininga)</h3>
+                </div>
+                <div className="flex gap-3">
+                  {['SIM', 'NÃO'].map(opt => (
+                    <button 
+                      type="button" key={opt}
+                      className={`flex-1 p-4 rounded-xl border-2 font-black text-xs uppercase tracking-widest transition-all ${formData.interesseUsina === opt ? 'bg-black border-black text-white shadow-lg' : 'bg-white border-emerald-200 hover:border-emerald-300'}`}
+                      onClick={() => setFormData({...formData, interesseUsina: opt})}
+                    >{opt}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {status.error && <p className="text-red-500 font-bold text-center text-xs bg-red-50 p-3 rounded-lg border border-red-200 animate-pop">{status.error}</p>}
+
+            <button 
+              type="submit" disabled={status.loading}
+              className="w-full py-6 bg-emerald-600 hover:bg-emerald-700 text-white text-2xl font-black rounded-3xl shadow-xl uppercase transition-all flex items-center justify-center active:scale-95 disabled:opacity-50"
+            >
+              {status.loading ? <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></span> : null}
+              {status.loading ? 'A registar...' : 'Registar Interesse'}
+            </button>
+          </form>
+
+          <div className="text-center pt-8 pb-4">
+            <button onClick={() => setView('login')} className="text-white/70 font-black text-[10px] uppercase tracking-widest hover:text-white transition-colors drop-shadow-md">Acesso Administrativo</button>
+            {view === 'login' && (
+              <div className="mt-4 p-5 glass rounded-2xl animate-in max-w-xs mx-auto border border-white/50 shadow-2xl">
+                <input 
+                  type="password" placeholder="Senha" 
+                  className="w-full p-3 rounded-xl border border-emerald-200 mb-3 text-center text-xs shadow-inner bg-white/80 focus:bg-white"
+                  onChange={e => setAdminPass(e.target.value)}
+                />
+                <button onClick={loginAdmin} className="w-full py-3 bg-black text-white rounded-xl font-bold text-[10px] uppercase tracking-widest active:scale-95">Entrar</button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
