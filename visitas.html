@@ -25,6 +25,8 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     * { color: #1f2937; }
     input { font-weight: 700 !important; }
+    .course-logo { width: 80px; height: 80px; object-contain; margin-bottom: 12px; }
+    .company-logo { width: 48px; height: 48px; object-contain; background: white; border-radius: 12px; padding: 4px; border: 1px solid #e5e7eb; }
   </style>
 </head>
 <body class="visit-bg min-h-screen antialiased p-4 sm:p-8">
@@ -147,47 +149,76 @@
             <p className="font-bold opacity-80 mt-2">Levantamento de Interesse dos Alunos</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="glass rounded-[2.5rem] p-8 sm:p-12 shadow-2xl animate-in space-y-8 border border-white/50">
+          <form onSubmit={handleSubmit} className="glass rounded-[2.5rem] p-8 sm:p-12 shadow-2xl animate-in space-y-10 border border-white/50">
             <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-widest opacity-50 block ml-2">Identificação</label>
               <input 
                 type="text" placeholder="Nome Completo *" required 
-                className="w-full p-4 rounded-2xl border-2 border-emerald-100 outline-none focus:border-emerald-500 transition-all uppercase"
+                className="w-full p-4 rounded-2xl border-2 border-emerald-100 outline-none focus:border-emerald-500 transition-all uppercase shadow-inner"
                 onChange={e => setFormData({...formData, nome: e.target.value})}
               />
               
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                {['ADM', 'AGRO'].map(c => (
+              <div className="grid grid-cols-2 gap-4 mt-6">
+                {[
+                  {id: 'ADM', label: 'Administração', img: './logo_adm.png'},
+                  {id: 'AGRO', label: 'Agronegócio', img: './logo_agro.png'}
+                ].map(c => (
                   <button 
-                    type="button" key={c}
-                    className={`p-4 rounded-2xl border-2 font-black transition-all ${formData.curso === c ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-emerald-100 hover:bg-emerald-50'}`}
-                    onClick={() => setFormData({...formData, curso: c})}
-                  >Curso {c}</button>
+                    type="button" key={c.id}
+                    className={`p-6 flex flex-col items-center justify-center rounded-3xl border-2 transition-all active:scale-95 ${formData.curso === c.id ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg scale-105' : 'bg-white border-emerald-100 hover:bg-emerald-50 hover:border-emerald-200'}`}
+                    onClick={() => setFormData({...formData, curso: c.id})}
+                  >
+                    {/* LOGO DO CURSO */}
+                    <img 
+                      src={c.img} alt={c.label} 
+                      className="course-logo" 
+                      onError={(e) => e.target.src=`https://via.placeholder.com/80?text=${c.id}`}
+                    />
+                    <span className={`font-black text-sm uppercase tracking-tight ${formData.curso === c.id ? 'text-white' : 'text-emerald-900'}`}>Curso {c.id}</span>
+                  </button>
                 ))}
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="p-6 bg-emerald-50 rounded-3xl space-y-4">
-                <h3 className="font-black text-sm uppercase tracking-tight">1. Visita Tranbrasa (Santos)</h3>
-                <div className="flex gap-2">
+            <div className="space-y-8">
+              {/* VISITA 1: TRANBRASA */}
+              <div className="p-6 bg-emerald-50 rounded-3xl space-y-5 shadow-inner border border-emerald-100">
+                <div className="flex items-center gap-3">
+                  {/* LOGO DA EMPRESA 1 */}
+                  <img 
+                    src="./logo_tranbrasa.png" alt="Tranbrasa Santos" 
+                    className="company-logo"
+                    onError={(e) => e.target.src='https://via.placeholder.com/48?text=Santos'}
+                  />
+                  <h3 className="font-black text-sm uppercase tracking-tight text-emerald-950 flex-1">1. Visita Tranbrasa (Santos)</h3>
+                </div>
+                <div className="flex gap-3">
                   {['SIM', 'NÃO'].map(opt => (
                     <button 
                       type="button" key={opt}
-                      className={`flex-1 p-3 rounded-xl border-2 font-black text-xs transition-all ${formData.interesseTranbrasa === opt ? 'bg-black border-black text-white' : 'bg-white border-emerald-200'}`}
+                      className={`flex-1 p-4 rounded-xl border-2 font-black text-xs uppercase tracking-widest transition-all ${formData.interesseTranbrasa === opt ? 'bg-black border-black text-white shadow-lg' : 'bg-white border-emerald-200 hover:border-emerald-300'}`}
                       onClick={() => setFormData({...formData, interesseTranbrasa: opt})}
                     >{opt}</button>
                   ))}
                 </div>
               </div>
 
-              <div className="p-6 bg-emerald-50 rounded-3xl space-y-4">
-                <h3 className="font-black text-sm uppercase tracking-tight">2. Usina Vista Alegre (Itapetininga)</h3>
-                <div className="flex gap-2">
+              {/* VISITA 2: USINA */}
+              <div className="p-6 bg-emerald-50 rounded-3xl space-y-5 shadow-inner border border-emerald-100">
+                <div className="flex items-center gap-3">
+                  {/* LOGO DA EMPRESA 2 */}
+                  <img 
+                    src="./logo_usina.png" alt="Usina Vista Alegre" 
+                    className="company-logo"
+                    onError={(e) => e.target.src='https://via.placeholder.com/48?text=Usina'}
+                  />
+                  <h3 className="font-black text-sm uppercase tracking-tight text-emerald-950 flex-1">2. Usina Vista Alegre (Itapetininga)</h3>
+                </div>
+                <div className="flex gap-3">
                   {['SIM', 'NÃO'].map(opt => (
                     <button 
                       type="button" key={opt}
-                      className={`flex-1 p-3 rounded-xl border-2 font-black text-xs transition-all ${formData.interesseUsina === opt ? 'bg-black border-black text-white' : 'bg-white border-emerald-200'}`}
+                      className={`flex-1 p-4 rounded-xl border-2 font-black text-xs uppercase tracking-widest transition-all ${formData.interesseUsina === opt ? 'bg-black border-black text-white shadow-lg' : 'bg-white border-emerald-200 hover:border-emerald-300'}`}
                       onClick={() => setFormData({...formData, interesseUsina: opt})}
                     >{opt}</button>
                   ))}
@@ -195,26 +226,27 @@
               </div>
             </div>
 
-            {status.error && <p className="text-red-500 font-bold text-center text-xs">{status.error}</p>}
+            {status.error && <p className="text-red-500 font-bold text-center text-xs bg-red-50 p-3 rounded-lg border border-red-200 animate-pop">{status.error}</p>}
 
             <button 
               type="submit" disabled={status.loading}
-              className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 text-white text-xl font-black rounded-2xl shadow-xl uppercase transition-all active:scale-95"
+              className="w-full py-6 bg-emerald-600 hover:bg-emerald-700 text-white text-2xl font-black rounded-3xl shadow-xl uppercase transition-all flex items-center justify-center active:scale-95 disabled:opacity-50"
             >
-              {status.loading ? 'A enviar...' : 'Registar Interesse'}
+              {status.loading ? <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></span> : null}
+              {status.loading ? 'A registar...' : 'Registar Interesse'}
             </button>
           </form>
 
-          <div className="text-center">
+          <div className="text-center pt-8">
             <button onClick={() => setView('login')} className="text-white/40 font-black text-[10px] uppercase tracking-widest hover:text-white transition-colors">Acesso Administrativo</button>
             {view === 'login' && (
-              <div className="mt-4 p-4 glass rounded-2xl animate-in max-w-xs mx-auto">
+              <div className="mt-4 p-5 glass rounded-2xl animate-in max-w-xs mx-auto border border-white/50 shadow-xl">
                 <input 
                   type="password" placeholder="Senha" 
-                  className="w-full p-2 rounded-lg border border-emerald-200 mb-2 text-center text-xs"
+                  className="w-full p-3 rounded-xl border border-emerald-200 mb-3 text-center text-xs shadow-inner"
                   onChange={e => setAdminPass(e.target.value)}
                 />
-                <button onClick={loginAdmin} className="w-full py-2 bg-black text-white rounded-lg font-bold text-[10px] uppercase">Entrar</button>
+                <button onClick={loginAdmin} className="w-full py-3 bg-black text-white rounded-xl font-bold text-[10px] uppercase tracking-widest active:scale-95">Entrar</button>
               </div>
             )}
           </div>
