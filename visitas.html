@@ -37,7 +37,9 @@
 
     .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
     .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+    .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pop { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     * { color: #1f2937; }
     input { font-weight: 700 !important; }
     .course-logo { width: 80px; height: 80px; object-contain; margin-bottom: 12px; }
@@ -63,6 +65,8 @@
       appId: "1:212303991437:web:a17de2c0ac4e9ed1de88c4"
     };
 
+    const IconTrash = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>;
+
     function App() {
       const [view, setView] = useState('form');
       const [status, setStatus] = useState({ loading: false, error: '', submitted: false });
@@ -70,6 +74,7 @@
       const [user, setUser] = useState(null);
       const [responses, setResponses] = useState([]);
       const [adminPass, setAdminPass] = useState("");
+      const [deletingId, setDeletingId] = useState(null);
 
       const [formData, setFormData] = useState({
         nome: '',
@@ -116,32 +121,34 @@
         try {
           const { collection, getDocs } = window.FirebaseLib;
           const snap = await getDocs(collection(db, 'visitas_tecnicas'));
-          setResponses(snap.docs.map(d => ({...d.data(), id: d.id})));
+          const data = snap.docs.map(d => ({...d.data(), id: d.id}));
+          // Ordenar pelas respostas mais recentes (opcional, mas recomendado)
+          data.sort((a, b) => b.timestamp - a.timestamp);
+          setResponses(data);
           setView('admin');
           setStatus(s => ({...s, error: ''}));
         } catch (e) { setStatus(s => ({...s, error: 'Erro ao carregar dados'})); }
       };
 
-      // FUNÇÃO DE EXPORTAR O EXCEL PARA AS VISITAS TÉCNICAS
+      const handleDelete = async (id) => {
+        try {
+          const { deleteDoc, doc } = window.FirebaseLib;
+          await deleteDoc(doc(db, 'visitas_tecnicas', id));
+          setResponses(responses.filter(r => r.id !== id));
+          setDeletingId(null);
+        } catch (err) { setStatus(s => ({...s, error: 'Erro ao apagar registo.'})); }
+      };
+
       const exportCSV = () => {
-        // Calcular totais
         const tranbrasaSim = responses.filter(r => r.interesseTranbrasa === 'SIM').length;
         const tranbrasaNao = responses.filter(r => r.interesseTranbrasa === 'NÃO').length;
         const usinaSim = responses.filter(r => r.interesseUsina === 'SIM').length;
         const usinaNao = responses.filter(r => r.interesseUsina === 'NÃO').length;
 
-        // Cabeçalho separado por ponto e vírgula
         const headers = "Nome do Aluno;Curso;Visita Tranbrasa (Santos);Visita Usina Vista Alegre\n";
-        
-        // Dados de cada aluno
-        const rows = responses.map(r => 
-          `"${r.nome}";"${r.curso}";"${r.interesseTranbrasa}";"${r.interesseUsina}"`
-        ).join("\n");
-        
-        // Resumo no fundo do Excel
+        const rows = responses.map(r => `"${r.nome}";"${r.curso}";"${r.interesseTranbrasa}";"${r.interesseUsina}"`).join("\n");
         const summary = `\n\n"--- RESUMO DE INTERESSES ---";"";"";""\n"TOTAL DE 'SIM'";"";"${tranbrasaSim}";"${usinaSim}"\n"TOTAL DE 'NÃO'";"";"${tranbrasaNao}";"${usinaNao}"`;
 
-        // \uFEFF para forçar os acentos corretos no Excel
         const blob = new Blob(["\uFEFF" + headers + rows + summary], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -173,7 +180,6 @@
               </div>
             </div>
 
-            {/* CAIXAS DE RESUMO NO ECRÃ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div className="bg-emerald-50/50 p-4 rounded-xl shadow-inner border border-emerald-100 flex flex-col justify-center">
                 <h3 className="font-black text-xs uppercase text-emerald-900 mb-2">Resumo: Tranbrasa (Santos)</h3>
@@ -199,6 +205,7 @@
                     <th className="p-3">Curso</th>
                     <th className="p-3">Tranbrasa (Santos)</th>
                     <th className="p-3">Usina Vista Alegre</th>
+                    <th className="p-3 text-center">Ação</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -208,6 +215,18 @@
                       <td className="p-3 text-emerald-900">{r.curso}</td>
                       <td className={`p-3 ${r.interesseTranbrasa === 'SIM' ? 'text-emerald-600' : 'text-red-400'}`}>{r.interesseTranbrasa}</td>
                       <td className={`p-3 ${r.interesseUsina === 'SIM' ? 'text-emerald-600' : 'text-red-400'}`}>{r.interesseUsina}</td>
+                      <td className="p-3 text-center">
+                        {deletingId === r.id ? (
+                          <div className="flex gap-1 justify-center animate-pop">
+                            <button onClick={() => handleDelete(r.id)} className="bg-red-600 text-white p-1 rounded font-black text-[8px] uppercase">Apagar</button>
+                            <button onClick={() => setDeletingId(null)} className="bg-slate-300 p-1 rounded text-[8px] font-black uppercase text-black">Não</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => setDeletingId(r.id)} className="text-red-500 hover:text-red-700 p-1 transition-transform hover:scale-125">
+                            <IconTrash />
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -256,7 +275,6 @@
             </div>
 
             <div className="space-y-8">
-              {/* VISITA 1: TRANBRASA */}
               <div className="p-6 bg-emerald-50/80 rounded-3xl space-y-5 shadow-inner border border-emerald-100">
                 <div className="flex items-center gap-3">
                   <img 
@@ -278,7 +296,6 @@
                 </div>
               </div>
 
-              {/* VISITA 2: USINA */}
               <div className="p-6 bg-emerald-50/80 rounded-3xl space-y-5 shadow-inner border border-emerald-100">
                 <div className="flex items-center gap-3">
                   <img 
