@@ -259,7 +259,7 @@
                       {deletingId === r.id ? (
                         <div className="flex gap-1 justify-center animate-pop">
                           <button onClick={() => handleDelete(r.id)} className="bg-red-600 text-white p-1 rounded font-black text-[8px] uppercase">Apagar</button>
-                          <button onClick={() => setDeletingId(null)} className="bg-slate-300 p-1 rounded text-[8px] font-black uppercase">Não</button>
+                          <button onClick={() => setDeletingId(null)} className="bg-slate-300 p-1 rounded text-[8px] font-black uppercase text-black">Não</button>
                         </div>
                       ) : (
                         <button onClick={() => setDeletingId(r.id)} className="text-red-500 hover:text-red-700 p-2 transition-transform hover:scale-125">
@@ -327,16 +327,22 @@
       }
 
       return (
-        <div className="py-4 px-4 max-w-3xl mx-auto">
-          <div className="text-center mb-4">
-            <img src="./logo.png" alt="Logo" className="mx-auto w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-2xl mb-1" onError={(e) => e.target.src='https://via.placeholder.com/150?text=LOGO'} />
+        <div className="py-8 px-4 max-w-3xl mx-auto">
+          
+          <div className="text-center mb-6">
             <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-xl leading-none text-center">Questionário Alunos Técnico</h1>
-            <p className="text-white font-black opacity-100 mt-1 italic text-base sm:text-lg text-center">Escola Castanho de Almeida • 2026</p>
+            <p className="text-white font-black opacity-100 mt-2 italic text-base sm:text-lg text-center">Escola Castanho de Almeida • 2026</p>
           </div>
 
           {formError && <div className="bg-red-600 text-white p-4 rounded-2xl mb-6 font-black text-center shadow-xl border-4 border-white animate-pop">⚠️ {formError}</div>}
 
           <form onSubmit={handleSubmit} className="glass-effect space-y-8 rounded-[2.5rem] p-6 sm:p-12 shadow-2xl border border-white/20">
+            
+            {/* LOGO DA ESCOLA MOVIDO PARA DENTRO DA CAIXA BRANCA */}
+            <div className="flex justify-center mb-2">
+              <img src="./logo.png" alt="Logo Escola" className="w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-xl" onError={(e) => { e.target.style.display = 'none'; }} />
+            </div>
+
             <div className="space-y-6">
               <h2 className="text-xl font-black uppercase flex items-center border-b-4 pb-3 border-black">
                 <span className="mr-3 p-2 bg-slate-100 rounded-xl"><IconUser /></span> 1. Identificação
@@ -366,12 +372,12 @@
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <label className={`flex flex-col items-center p-6 border-2 border-black rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'ADM' ? 'bg-blue-700 border-blue-700 text-white shadow-xl scale-105' : 'bg-white text-black opacity-80'}`}>
                   <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'ADM', empresasRank: [], prefeituraRank: [], treloRank: []})} />
-                  <img src="./logo_adm.png" alt="ADM" className="mb-4 w-16 h-16 object-contain" onError={(e) => e.target.src='https://via.placeholder.com/80?text=ADM'} />
+                  <img src="./logo_adm.png" alt="ADM" className="mb-4 w-16 h-16 object-contain" onError={(e) => { e.target.style.display = 'none'; }} />
                   <span className="font-black uppercase tracking-widest">Administração</span>
                 </label>
                 <label className={`flex flex-col items-center p-6 border-2 border-black rounded-[2rem] cursor-pointer transition-all ${formData.curso === 'AGRO' ? 'bg-orange-600 border-orange-600 text-white shadow-xl scale-105' : 'bg-white text-black opacity-80'}`}>
                   <input type="radio" name="curso" className="sr-only" required onChange={() => setFormData({...formData, curso: 'AGRO', empresasRank: [], prefeituraRank: [], treloRank: []})} />
-                  <img src="./logo_agro.png" alt="AGRO" className="mb-4 w-16 h-16 object-contain" onError={(e) => e.target.src='https://via.placeholder.com/80?text=AGRO'} />
+                  <img src="./logo_agro.png" alt="AGRO" className="mb-4 w-16 h-16 object-contain" onError={(e) => { e.target.style.display = 'none'; }} />
                   <span className="font-black uppercase tracking-widest">Agronegócio</span>
                 </label>
               </div>
@@ -440,4 +446,36 @@
                           {areasTrelo.map(a => {
                             const rank = formData.treloRank.indexOf(a);
                             return (
-                              <div key={a} onClick={() => handleRanking('treloRank', a, areasTrelo.length)} className={`relative p-3 border-2 border-black rounded-xl cursor-pointer text-center text-[10px] ${rank !== -1 ? 'bg-blue-700 text-white
+                              <div key={a} onClick={() => handleRanking('treloRank', a, areasTrelo.length)} className={`relative p-3 border-2 border-black rounded-xl cursor-pointer text-center text-[10px] ${rank !== -1 ? 'bg-blue-700 text-white shadow-xl' : 'bg-white text-black hover:border-slate-300'}`}>
+                                {rank !== -1 && <span className="rank-badge">{rank + 1}º</span>}
+                                {a}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-8 border-2 border-black border-dashed rounded-[2rem] text-center opacity-70 bg-white italic font-black uppercase text-[10px]">Insira o CIEE (7 caracteres) para liberar as opções...</div>
+                )}
+              </div>
+            )}
+
+            <button type="submit" disabled={isSaving} className="w-full py-6 bg-orange-600 hover:bg-orange-700 text-white text-2xl font-black rounded-[2rem] shadow-xl uppercase transition-all flex items-center justify-center active:scale-95 border-2 border-black">
+              {isSaving ? <span className="loading-spinner"></span> : "ENVIAR MINHA RESPOSTA"}
+            </button>
+          </form>
+          
+          <p onClick={() => setView('admin_login')} className="text-center text-white/50 font-black text-[10px] mt-8 tracking-widest uppercase cursor-pointer hover:text-white transition-colors select-none">
+            &copy; 2026 Escola Coronel Castanho de Almeida
+          </p>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
