@@ -199,17 +199,24 @@
         agro: responses.filter(r => r.curso === 'AGRO')
       }), [responses]);
 
+      // NOVA LÓGICA DE EXPORTAÇÃO SEPARADA POR COLUNAS
       const exportCSV = () => {
-        const headers = "Nome;Email;Celular/Telefone;CPF;RA;Ano;Curso;Interesse;CIEE;Ranking_Empresas;Setores_Prefeitura;Setores_Trelo\n";
+        // Cabeçalhos agora separados por cada opção
+        const headers = "Nome;Email;Celular/Telefone;CPF;RA;Ano;Curso;Interesse;CIEE;1ª Opção Empresa;2ª Opção Empresa;3ª Opção Empresa;4ª Opção Empresa;1ª Opção Pref;2ª Opção Pref;3ª Opção Pref;4ª Opção Pref;5ª Opção Pref;1ª Opção Trelo;2ª Opção Trelo;3ª Opção Trelo;4ª Opção Trelo\n";
         
-        const rows = responses.map(r => 
-          `"${r.nome}";"${r.email}";"${r.telefone}";"${r.cpf}";"${r.ra}";"${r.ano}";"${r.curso}";"${r.interesse}";"${r.codigoCiee ? r.codigoCiee.toUpperCase() : ''}";"${r.empresasRank ? r.empresasRank.join(' > ') : ''}";"${r.prefeituraRank ? r.prefeituraRank.join(' | ') : ''}";"${r.treloRank ? r.treloRank.join(' | ') : ''}"`
-        ).join("\n");
+        const rows = responses.map(r => {
+          // Arrays de respostas garantidos para evitar erros
+          const emp = r.empresasRank || [];
+          const pref = r.prefeituraRank || [];
+          const trelo = r.treloRank || [];
+
+          return `"${r.nome}";"${r.email}";"${r.telefone}";"${r.cpf}";"${r.ra}";"${r.ano}";"${r.curso}";"${r.interesse}";"${r.codigoCiee ? r.codigoCiee.toUpperCase() : ''}";"${emp[0] || ''}";"${emp[1] || ''}";"${emp[2] || ''}";"${emp[3] || ''}";"${pref[0] || ''}";"${pref[1] || ''}";"${pref[2] || ''}";"${pref[3] || ''}";"${pref[4] || ''}";"${trelo[0] || ''}";"${trelo[1] || ''}";"${trelo[2] || ''}";"${trelo[3] || ''}"`;
+        }).join("\n");
         
         const blob = new Blob(["\uFEFF" + headers + rows], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "relatorio_estagio_2026.csv");
+        link.setAttribute("download", "relatorio_estagio_separado_2026.csv");
         link.click();
       };
 
