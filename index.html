@@ -1,359 +1,359 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estoque de Figurinhas</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Estoque de Figurinhas da Copa</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="h-screen flex flex-col md:flex-row p-4 gap-4">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+    <!-- PAINEL ESQUERDO: CONTROLES E VENDAS -->
+    <div class="w-full md:w-1/3 flex flex-col gap-4">
+        
+        <!-- Bloco 1: Entrada Rápida -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-plus text-green-500"></i> Entrada Rápida
+            </h2>
+            <div class="flex gap-2">
+                <input type="text" id="inputEntrada" placeholder="Ex: MEX1 (e aperte ENTER)" 
+                       class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:border-blue-400 uppercase font-bold text-gray-700 transition-colors">
+                <button onclick="adicionarDoInput()" class="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 transition-colors font-bold shadow-sm">
+                    Salvar
+                </button>
+            </div>
+            <p id="msgEntrada" class="text-xs text-green-500 mt-2 font-semibold h-4"></p>
+        </div>
 
-        const IconPackage = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>;
-        const IconSearch = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>;
-        const IconPlus = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
-        const IconMinus = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
-        const IconTrash = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>;
-        const IconSave = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>;
-        const IconCheck = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>;
-        const IconX = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>;
-        const IconCart = ({className}) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>;
+        <!-- Bloco 2: Cruzar Lista do Cliente -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col min-h-0">
+            <h2 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-magnifying-glass text-blue-500"></i> Cruzar Lista do Cliente
+            </h2>
+            
+            <div id="areaBusca" class="flex flex-col flex-1 min-h-0">
+                <textarea id="textoLista" placeholder="Cole a lista do cliente aqui...&#10;Ex:&#10;MEX: 3, 7, 11&#10;Suíça (SUI):&#10;7, 10&#10;Coca-Cola (CC): CC4" 
+                          class="flex-1 w-full border-2 border-gray-200 rounded-xl p-3 focus:outline-none focus:border-blue-400 resize-none mb-3 text-sm"></textarea>
+                <button onclick="cruzarLista()" class="w-full bg-slate-800 text-white py-3 rounded-xl hover:bg-slate-700 transition-colors font-bold shadow-sm text-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check-double"></i> Verificar Disponibilidade
+                </button>
+            </div>
 
-        function App() {
-            const [inventory, setInventory] = useState({});
-            const [isLoaded, setIsLoaded] = useState(false);
-            const [quickAddCode, setQuickAddCode] = useState('');
-            const [clientList, setClientList] = useState('');
-            const [checkResults, setCheckResults] = useState(null);
-            const quickAddInputRef = useRef(null);
+            <!-- Resultados do Cruzamento (Escondido por Padrão) -->
+            <div id="areaResultado" class="hidden flex-col flex-1 min-h-0">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-gray-700 text-lg">Resultado</h3>
+                    <button onclick="voltarBusca()" class="text-blue-500 hover:text-blue-700 text-sm font-semibold">Voltar</button>
+                </div>
 
-            useEffect(() => {
-                const savedInventory = localStorage.getItem('estoqueFigurinhasDB');
-                if (savedInventory) {
-                    try { setInventory(JSON.parse(savedInventory)); } catch (e) {}
-                }
-                setIsLoaded(true);
-            }, []);
-
-            useEffect(() => {
-                if (isLoaded) {
-                    localStorage.setItem('estoqueFigurinhasDB', JSON.stringify(inventory));
-                }
-            }, [inventory, isLoaded]);
-
-            const handleQuickAdd = (e) => {
-                e?.preventDefault();
-                const code = quickAddCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-                if (!code) return;
-
-                setInventory(prev => ({
-                    ...prev,
-                    [code]: (prev[code] || 0) + 1
-                }));
-                setQuickAddCode('');
-                quickAddInputRef.current?.focus();
-            };
-
-            const updateQuantity = (code, delta) => {
-                setInventory(prev => {
-                    const newQty = (prev[code] || 0) + delta;
-                    const newInventory = { ...prev };
-                    if (newQty <= 0) delete newInventory[code];
-                    else newInventory[code] = newQty;
-                    return newInventory;
-                });
-            };
-
-            const removeSticker = (code) => {
-                setInventory(prev => {
-                    const newInventory = { ...prev };
-                    delete newInventory[code];
-                    return newInventory;
-                });
-            };
-
-            const handleCheckList = () => {
-                if (!clientList.trim()) return;
-
-                let cleanedList = [];
-                const lines = clientList.split('\n');
-                let currentPrefix = '';
-
-                for (let line of lines) {
-                    line = line.trim();
-                    if (!line) continue;
-
-                    // Procura o padrão "Suíça (SUI):"
-                    const matchParens = line.match(/\(([A-Z]+)\):?/i);
-                    // Procura o padrão "MEX: 3, 7"
-                    const matchDirect = line.match(/^([A-Z]{2,}):/i);
-
-                    let itemsPart = line;
-
-                    if (matchParens) {
-                        currentPrefix = matchParens[1].toUpperCase();
-                        const splitColon = line.split(':');
-                        if (splitColon.length > 1 && splitColon[1].trim()) {
-                            itemsPart = splitColon[1];
-                        } else {
-                            continue;
-                        }
-                    } else if (matchDirect) {
-                        currentPrefix = matchDirect[1].toUpperCase();
-                        itemsPart = line.substring(matchDirect[0].length);
-                    } else if (/^[A-Z]{2,}:/.test(line)) {
-                        // Trata casos em que não há espaço após os dois pontos, ex "MEX:3,7,11"
-                        const splitColon = line.split(':');
-                        currentPrefix = splitColon[0].trim().toUpperCase();
-                        itemsPart = splitColon[1];
-                    } else if (!itemsPart.match(/\d/)) {
-                         // Se a linha não tiver números e não tiver um prefixo claro (ex: o usuário digitou uma letra sem os dois pontos ou parênteses), a gente ignora pra não estragar a lógica.
-                         continue;
-                    }
-
-
-                    const items = itemsPart.split(/[\s,;-]+/);
-                    
-                    for (let item of items) {
-                        item = item.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-                        if (!item) continue;
-
-                        if (/^\d+$/.test(item) && currentPrefix) {
-                            cleanedList.push(currentPrefix + item);
-                        } 
-                        else if (!/^\d+$/.test(item)) { // Tem letra no meio (ex CC4 ou FWC)
-                           // Se o cara colocou a sigla inteira separada por vírgula no padrão "MEX: 3, MEX 4"
-                           cleanedList.push(item);
-                        }
-                    }
-                }
-
-                if (cleanedList.length === 0) return;
-
-                const requested = {};
-                cleanedList.forEach(code => {
-                    requested[code] = (requested[code] || 0) + 1;
-                });
-
-                const available = [];
-                const missing = [];
-                let totalValue = 0;
-                let premiumCount = 0;
-                let normalCount = 0;
-
-                Object.entries(requested).forEach(([code, reqQty]) => {
-                    const stockQty = inventory[code] || 0;
-                    
-                    const isPremium = code === '1' || /^[A-Z]+1$/.test(code);
-                    const price = isPremium ? 2.0 : 1.5;
-
-                    const registrarDisponiveis = (quantidade) => {
-                        for(let i=0; i<quantidade; i++) {
-                            available.push(code);
-                            totalValue += price;
-                            if (isPremium) premiumCount++;
-                            else normalCount++;
-                        }
-                    };
-                    
-                    if (stockQty >= reqQty) {
-                        registrarDisponiveis(reqQty);
-                    } else if (stockQty > 0) {
-                        registrarDisponiveis(stockQty);
-                        for(let i=0; i<(reqQty - stockQty); i++) missing.push(code);
-                    } else {
-                        for(let i=0; i<reqQty; i++) missing.push(code);
-                    }
-                });
-
-                setCheckResults({ available, missing, totalValue, premiumCount, normalCount, cleanedList });
-            };
-
-            const handleConfirmSale = () => {
-                if (!checkResults || checkResults.available.length === 0) return;
-
-                setInventory(prev => {
-                    const newInventory = { ...prev };
-                    checkResults.available.forEach(code => {
-                        if (newInventory[code] > 0) {
-                            newInventory[code] -= 1;
-                            if (newInventory[code] === 0) {
-                                delete newInventory[code];
-                            }
-                        }
-                    });
-                    return newInventory;
-                });
-
-                setCheckResults(null);
-                setClientList('');
-            };
-
-            const totalStickers = Object.values(inventory).reduce((acc, curr) => acc + curr, 0);
-            const totalUniqueCodes = Object.keys(inventory).length;
-
-            return (
-                <div className="min-h-screen p-4 md:p-8 text-slate-800">
-                    <div className="max-w-6xl mx-auto space-y-6">
-                        
-                        <header className="flex flex-col md:flex-row md:items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-slate-200 gap-4">
-                            <div>
-                                <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-                                    <IconPackage className="w-8 h-8 text-blue-600" />
-                                    Estoque de Figurinhas
-                                </h1>
-                                <p className="text-slate-500 mt-1">Controle, cruze listas e faça orçamentos automáticos.</p>
-                            </div>
-                            <div className="flex gap-4 text-sm font-medium">
-                                <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg border border-blue-100">Total: {totalStickers} unid.</div>
-                                <div className="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg border border-indigo-100">Códigos: {totalUniqueCodes}</div>
-                            </div>
-                        </header>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                            
-                            <div className="lg:col-span-5 space-y-6">
-                                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                        <IconPlus className="w-5 h-5 text-green-500" /> Entrada Rápida
-                                    </h2>
-                                    <form onSubmit={handleQuickAdd} className="flex gap-2">
-                                        <input
-                                            ref={quickAddInputRef}
-                                            type="text"
-                                            placeholder="Ex: MEX1 (e aperte Enter)"
-                                            className="flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase font-bold"
-                                            value={quickAddCode}
-                                            onChange={(e) => setQuickAddCode(e.target.value)}
-                                        />
-                                        <button type="submit" disabled={!quickAddCode.trim()} className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors">
-                                            <IconSave className="w-4 h-4" /> Salvar
-                                        </button>
-                                    </form>
-                                </section>
-
-                                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                        <IconSearch className="w-5 h-5 text-indigo-500" /> Cruzar Lista do Cliente
-                                    </h2>
-                                    
-                                    {!checkResults ? (
-                                        <div className="space-y-4">
-                                            <textarea
-                                                placeholder="Exemplos aceitos:&#10;MEX1, BRA10, QAT2&#10;MEX: 3, 7, 11&#10;Suíça (SUI): 7, 10"
-                                                className="w-full h-40 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none font-medium text-sm leading-relaxed"
-                                                value={clientList}
-                                                onChange={(e) => setClientList(e.target.value)}
-                                            />
-                                            <button onClick={handleCheckList} disabled={!clientList.trim()} className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
-                                                <IconSearch className="w-5 h-5" /> Verificar Estoque
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-5">
-                                            <div className="flex justify-between items-center border-b pb-2">
-                                                <h3 className="font-bold text-slate-800">Resultado</h3>
-                                                <button onClick={() => setCheckResults(null)} className="text-sm text-blue-600 hover:underline">Voltar</button>
-                                            </div>
-                                            {/* Debug para o usuário ver o que o sistema leu */}
-                                            <div className="text-xs text-slate-500 italic bg-slate-50 p-2 rounded-lg border border-slate-200 max-h-24 overflow-y-auto">
-                                                 <strong>Leitura do sistema:</strong> {checkResults.cleanedList.join(', ')}
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div className="bg-green-50 rounded-xl p-3 border border-green-200">
-                                                    <div className="text-green-800 font-bold mb-2 flex items-center gap-1"><IconCheck className="w-4 h-4"/> Tenho ({checkResults.available.length})</div>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {checkResults.available.map((c, i) => <span key={i} className="bg-white border border-green-300 text-green-700 px-1.5 py-0.5 rounded text-xs font-bold">{c}</span>)}
-                                                    </div>
-                                                </div>
-                                                <div className="bg-red-50 rounded-xl p-3 border border-red-200">
-                                                    <div className="text-red-800 font-bold mb-2 flex items-center gap-1"><IconX className="w-4 h-4"/> Falta ({checkResults.missing.length})</div>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {checkResults.missing.map((c, i) => <span key={i} className="bg-white border border-red-300 text-red-700 px-1.5 py-0.5 rounded text-xs font-bold">{c}</span>)}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {checkResults.available.length > 0 && (
-                                                <div className="bg-blue-900 rounded-xl p-4 text-white shadow-md">
-                                                    <h4 className="font-bold mb-2 text-blue-200">Orçamento</h4>
-                                                    <div className="text-sm space-y-1 mb-3">
-                                                        {checkResults.normalCount > 0 && <p>• {checkResults.normalCount}x Normais (R$ 1,50) = R$ {(checkResults.normalCount * 1.5).toFixed(2).replace('.', ',')}</p>}
-                                                        {checkResults.premiumCount > 0 && <p>• {checkResults.premiumCount}x Especiais n° 1 (R$ 2,00) = R$ {(checkResults.premiumCount * 2).toFixed(2).replace('.', ',')}</p>}
-                                                    </div>
-                                                    <div className="text-2xl font-black bg-blue-800 p-2 rounded-lg text-center border border-blue-700">
-                                                        Total: R$ {checkResults.totalValue.toFixed(2).replace('.', ',')}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <div className="pt-2">
-                                                <button onClick={handleConfirmSale} disabled={checkResults.available.length === 0} className="w-full bg-green-500 hover:bg-green-600 disabled:bg-slate-300 text-white py-4 rounded-xl font-black text-lg flex items-center justify-center gap-2 shadow-sm transition-colors">
-                                                    <IconCart className="w-6 h-6" /> Dar OK (Descontar do Estoque)
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </section>
-                            </div>
-
-                            <div className="lg:col-span-7">
-                                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-full flex flex-col">
-                                    <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                        <IconPackage className="w-5 h-5 text-slate-500" /> Meu Estoque
-                                    </h2>
-
-                                    {totalUniqueCodes === 0 ? (
-                                        <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-12">
-                                            <IconPackage className="w-16 h-16 mb-4 opacity-20" />
-                                            <p className="font-medium">Estoque vazio</p>
-                                        </div>
-                                    ) : (
-                                        <div className="flex-1 overflow-auto pr-2 custom-scrollbar max-h-[600px]">
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                                {Object.entries(inventory).sort(([a], [b]) => a.localeCompare(b)).map(([code, qty]) => (
-                                                    <div key={code} className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-3 hover:border-blue-300 transition-colors">
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="font-black text-lg tracking-wider">{code}</span>
-                                                            <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-md">x{qty}</span>
-                                                        </div>
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex bg-white border border-slate-300 rounded-lg overflow-hidden">
-                                                                <button onClick={() => updateQuantity(code, -1)} className="px-2 py-1 hover:bg-slate-100 text-slate-600"><IconMinus className="w-4 h-4" /></button>
-                                                                <div className="px-2 py-1 text-sm font-bold bg-slate-50 border-x border-slate-300 min-w-[2rem] text-center">{qty}</div>
-                                                                <button onClick={() => updateQuantity(code, 1)} className="px-2 py-1 hover:bg-slate-100 text-slate-600"><IconPlus className="w-4 h-4" /></button>
-                                                            </div>
-                                                            <button onClick={() => removeSticker(code)} className="p-1.5 text-slate-400 hover:text-red-500 bg-white border border-slate-200 rounded-lg"><IconTrash className="w-4 h-4" /></button>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </section>
-                            </div>
-
+                <div class="flex-1 overflow-y-auto pr-2 space-y-4 scrollbar-hide">
+                    <!-- Tenho -->
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-green-700 flex items-center gap-2">
+                                <i class="fa-regular fa-circle-check"></i> Tenho (<span id="qtdTenho">0</span>)
+                            </h4>
+                            <span id="valorTotal" class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-sm">R$ 0,00</span>
                         </div>
+                        <div id="listaTenho" class="flex flex-wrap gap-1"></div>
+                    </div>
+
+                    <!-- Falta -->
+                    <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                        <h4 class="font-bold text-red-700 flex items-center gap-2 mb-2">
+                            <i class="fa-regular fa-circle-xmark"></i> Falta (<span id="qtdFalta">0</span>)
+                        </h4>
+                        <div id="listaFalta" class="flex flex-wrap gap-1"></div>
                     </div>
                 </div>
-            );
+
+                <div class="pt-4 mt-2 border-t border-gray-100">
+                    <button id="btnDarBaixa" onclick="confirmarVenda()" class="w-full bg-green-500 text-white py-3 rounded-xl hover:bg-green-600 transition-colors font-bold shadow-sm text-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cart-shopping"></i> Dar OK (Baixa no Estoque)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAINEL DIREITO: ESTOQUE GERAL -->
+    <div class="w-full md:w-2/3 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-cubes text-slate-500"></i> Meu Estoque
+            </h2>
+            <div class="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">
+                Total: <span id="totalEstoque">0</span> figurinhas
+            </div>
+        </div>
+        
+        <!-- Grid de Figurinhas -->
+        <div id="gridEstoque" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 overflow-y-auto pr-2 content-start flex-1">
+            <!-- Os cards são injetados aqui pelo JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // === BANCO DE DADOS LOCAL ===
+        let estoque = JSON.parse(localStorage.getItem('estoque_figurinhas')) || {};
+        let vendaAtual = [];
+
+        function salvarEstoque() {
+            localStorage.setItem('estoque_figurinhas', JSON.stringify(estoque));
+            renderizarEstoque();
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        // === REGRAS DE PREÇO ===
+        function calcularPreco(codigo) {
+            // Se o código termina com "1" (ex: MEX1), o preço é R$ 2,00. Caso contrário, R$ 1,50.
+            const matchNumero = codigo.match(/\d+$/);
+            if (matchNumero && matchNumero[0] === "1") {
+                return 2.00;
+            }
+            return 1.50;
+        }
+
+        // === CÉREBRO DE LEITURA DAS LISTAS (NOVO E MELHORADO) ===
+        function extrairCodigosDaLista(textoBruto) {
+            const linhas = textoBruto.split(/\r?\n/);
+            let prefixoAtual = "";
+            let codigosEncontrados = new Set(); // Set evita figurinhas duplicadas na lista
+
+            for (let linha of linhas) {
+                linha = linha.trim();
+                if (!linha) continue;
+
+                // Tenta achar a sigla do país que vem antes de dois pontos ":"
+                // Ex: "MEX:" ou "Suíça (SUI):"
+                const prefixMatch = linha.match(/(?:\(([A-Za-z]{2,4})\)|([A-Za-z]{2,4}))\s*:/);
+                if (prefixMatch) {
+                    // Pega o grupo 1 (SUI) ou grupo 2 (MEX)
+                    prefixoAtual = (prefixMatch[1] || prefixMatch[2]).toUpperCase();
+                }
+
+                // Quebra a linha por vírgulas, espaços, ou traços
+                const pedacos = linha.split(/[\s,;\-]+/);
+
+                for (let pedaco of pedacos) {
+                    // Limpa tudo que não for letra ou número
+                    let limpo = pedaco.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                    if (!limpo) continue;
+
+                    // Se a palavra for exatamente a sigla (ex: "MEX"), ignora
+                    if (limpo === prefixoAtual) continue;
+
+                    // Se for apenas um NÚMERO (ex: "7"), junta com a sigla atual
+                    if (/^\d+$/.test(limpo)) {
+                        if (prefixoAtual) {
+                            codigosEncontrados.add(prefixoAtual + limpo);
+                        }
+                    } 
+                    // Se for LETRA + NÚMERO juntos (ex: "CC4", "FWC13"), adiciona direto
+                    else if (/^[A-Z]+\d+$/.test(limpo)) {
+                        codigosEncontrados.add(limpo);
+                    }
+                }
+            }
+            return Array.from(codigosEncontrados);
+        }
+
+        // === FUNÇÕES DE ESTOQUE ===
+        function adicionarEstoque(codigo, quantidade = 1) {
+            codigo = codigo.replace(/\s+/g, '').toUpperCase();
+            // Valida se é formato Letra + Número
+            if (!/^[A-Z]+\d+$/.test(codigo)) return false;
+
+            if (estoque[codigo]) {
+                estoque[codigo] += quantidade;
+            } else {
+                estoque[codigo] = quantidade;
+            }
+            salvarEstoque();
+            return true;
+        }
+
+        function alterarQuantidade(codigo, delta) {
+            if (estoque[codigo]) {
+                estoque[codigo] += delta;
+                if (estoque[codigo] <= 0) {
+                    delete estoque[codigo];
+                }
+                salvarEstoque();
+            }
+        }
+
+        function removerItem(codigo) {
+            delete estoque[codigo];
+            salvarEstoque();
+        }
+
+        // === INTERAÇÃO COM A TELA ===
+        const inputEntrada = document.getElementById('inputEntrada');
+        const msgEntrada = document.getElementById('msgEntrada');
+
+        inputEntrada.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adicionarDoInput();
+            }
+        });
+
+        function adicionarDoInput() {
+            const val = inputEntrada.value;
+            if (val) {
+                const sucesso = adicionarEstoque(val);
+                if (sucesso) {
+                    msgEntrada.textContent = val.toUpperCase() + " adicionado!";
+                    setTimeout(() => msgEntrada.textContent = "", 2000);
+                    inputEntrada.value = "";
+                } else {
+                    msgEntrada.textContent = "Código inválido! Use formato MEX1";
+                    msgEntrada.classList.replace('text-green-500', 'text-red-500');
+                    setTimeout(() => {
+                        msgEntrada.textContent = "";
+                        msgEntrada.classList.replace('text-red-500', 'text-green-500');
+                    }, 2000);
+                }
+            }
+            inputEntrada.focus();
+        }
+
+        function renderizarEstoque() {
+            const grid = document.getElementById('gridEstoque');
+            grid.innerHTML = '';
+            
+            // Ordenar alfabeticamente/numéricamente
+            const codigosOrdem = Object.keys(estoque).sort((a, b) => {
+                const prefixA = a.match(/[A-Z]+/)[0];
+                const prefixB = b.match(/[A-Z]+/)[0];
+                if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+                
+                const numA = parseInt(a.match(/\d+/)[0]);
+                const numB = parseInt(b.match(/\d+/)[0]);
+                return numA - numB;
+            });
+
+            let totalCards = 0;
+
+            codigosOrdem.forEach(codigo => {
+                const qtd = estoque[codigo];
+                totalCards += qtd;
+
+                const preco = calcularPreco(codigo);
+                const isBrilhante = preco === 2.00;
+
+                const card = document.createElement('div');
+                card.className = "bg-white border rounded-xl p-3 flex flex-col justify-between shadow-sm relative";
+                if(isBrilhante) card.classList.add("border-amber-200", "bg-amber-50/30");
+                else card.classList.add("border-gray-200");
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="font-bold text-gray-800 text-base">${codigo}</span>
+                        <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">x${qtd}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-1">
+                        <div class="flex bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                            <button onclick="alterarQuantidade('${codigo}', -1)" class="px-2 py-1 hover:bg-gray-200 text-gray-600"><i class="fa-solid fa-minus text-xs"></i></button>
+                            <span class="px-2 py-1 text-sm font-bold bg-white w-6 text-center">${qtd}</span>
+                            <button onclick="alterarQuantidade('${codigo}', 1)" class="px-2 py-1 hover:bg-gray-200 text-gray-600"><i class="fa-solid fa-plus text-xs"></i></button>
+                        </div>
+                        <button onclick="removerItem('${codigo}')" class="text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('totalEstoque').textContent = totalCards;
+        }
+
+        // === CRUZAMENTO E VENDAS ===
+        function cruzarLista() {
+            const textoBruto = document.getElementById('textoLista').value;
+            if(!textoBruto.trim()) return;
+
+            const listaCliente = extrairCodigosDaLista(textoBruto);
+            
+            const tenho = [];
+            const falta = [];
+            let valorTotal = 0;
+
+            // Criar cópia temporária do estoque para garantir que não vamos vender mais do que temos da mesma figurinha na lista
+            let estoqueTemp = {...estoque};
+
+            listaCliente.forEach(codigo => {
+                if (estoqueTemp[codigo] && estoqueTemp[codigo] > 0) {
+                    tenho.push(codigo);
+                    estoqueTemp[codigo] -= 1; // Deduz na simulação
+                    valorTotal += calcularPreco(codigo);
+                } else {
+                    falta.push(codigo);
+                }
+            });
+
+            vendaAtual = tenho; // Salva o que deu "match" para a baixa
+
+            // Renderizar Resultados
+            document.getElementById('qtdTenho').textContent = tenho.length;
+            document.getElementById('qtdFalta').textContent = falta.length;
+            document.getElementById('valorTotal').textContent = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
+
+            const containerTenho = document.getElementById('listaTenho');
+            containerTenho.innerHTML = tenho.map(c => 
+                `<span class="px-2 py-1 text-xs font-bold text-green-700 bg-white border border-green-300 rounded-md shadow-sm">${c}</span>`
+            ).join('');
+
+            const containerFalta = document.getElementById('listaFalta');
+            containerFalta.innerHTML = falta.map(c => 
+                `<span class="px-2 py-1 text-xs font-bold text-red-600 bg-white border border-red-300 rounded-md">${c}</span>`
+            ).join('');
+
+            // Trocar Telas
+            document.getElementById('areaBusca').classList.add('hidden');
+            document.getElementById('areaResultado').classList.remove('hidden');
+            document.getElementById('areaResultado').classList.add('flex');
+            
+            // Habilita ou desabilita botão de baixa
+            const btnBaixa = document.getElementById('btnDarBaixa');
+            if (tenho.length === 0) {
+                btnBaixa.classList.add('opacity-50', 'cursor-not-allowed');
+                btnBaixa.disabled = true;
+            } else {
+                btnBaixa.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnBaixa.disabled = false;
+            }
+        }
+
+        function voltarBusca() {
+            document.getElementById('areaResultado').classList.add('hidden');
+            document.getElementById('areaResultado').classList.remove('flex');
+            document.getElementById('areaBusca').classList.remove('hidden');
+            vendaAtual = [];
+        }
+
+        function confirmarVenda() {
+            if(vendaAtual.length === 0) return;
+
+            // Da a baixa real no estoque local
+            vendaAtual.forEach(codigo => {
+                alterarQuantidade(codigo, -1);
+            });
+
+            alert(`Venda confirmada! ${vendaAtual.length} figurinhas removidas do estoque.`);
+            document.getElementById('textoLista').value = ""; // Limpa a caixa de texto
+            voltarBusca();
+        }
+
+        // Inicializa ao carregar
+        renderizarEstoque();
     </script>
 </body>
 </html>
